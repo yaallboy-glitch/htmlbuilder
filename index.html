@@ -69,7 +69,7 @@
     <span class="spacer"></span>
     <button class="btn btn-ghost" onclick="undoAction()">↩ Undo</button>
     <button class="btn btn-ghost" onclick="redoAction()">↪ Redo</button>
-    <button class="btn btn-warning" onclick="bypassLogin()" title="Bypass login di file HTML">🔓 Bypass Login</button>
+    <button class="btn btn-warning" onclick="togglePreviewPanel()" title="Simulasi tampilan logged-in untuk keperluan edit layout">👁️ Preview State</button>
     <button class="btn btn-success" onclick="downloadHTML()">⬇ Download</button>
     <button class="btn btn-danger" onclick="resetEditor()">✕ Reset</button>
 </header>
@@ -88,6 +88,24 @@
         <div id="fileInfo">
             <div>📁 <span id="fileName">-</span></div>
             <div>📦 <span id="fileSize">-</span></div>
+        </div>
+
+        <hr style="border-color:rgba(255,255,255,.06);margin:10px 0">
+
+        <div class="panel-title">👁️ Preview State</div>
+        <div id="previewStatePanel" style="display:none;margin-bottom:10px;padding:10px;background:rgba(251,146,60,.05);border:1px solid rgba(251,146,60,.12);border-radius:8px">
+            <div style="font-size:9px;color:#a1a1aa;margin-bottom:8px;line-height:1.5">
+                Simulasi tampilan <b>hanya di preview lokal ini</b> (tidak login ke server asli). Untuk keperluan edit layout saja.
+            </div>
+            <label style="display:flex;align-items:center;gap:6px;font-size:10px;color:#e4e4e7;margin-bottom:6px;cursor:pointer">
+                <input type="checkbox" id="pvLoggedIn" onchange="applyPreviewState()"> Simulasikan sudah login
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:10px;color:#e4e4e7;margin-bottom:6px;cursor:pointer">
+                <input type="checkbox" id="pvPremium" onchange="applyPreviewState()"> Simulasikan status premium/subscriber
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:10px;color:#e4e4e7;margin-bottom:2px;cursor:pointer">
+                <input type="checkbox" id="pvAdmin" onchange="applyPreviewState()"> Simulasikan akses admin
+            </label>
         </div>
 
         <hr style="border-color:rgba(255,255,255,.06);margin:10px 0">
@@ -132,7 +150,7 @@
             2. Klik elemen di preview<br>
             3. Double-click teks untuk edit<br>
             4. Ubah style di panel kiri<br>
-            5. 🔓 Bypass Login untuk file yg pake login
+            5. 👁️ Preview State kalau tampilan utama tersembunyi di balik login (simulasi lokal saja, tidak login sungguhan)
         </div>
     </aside>
 
@@ -165,6 +183,7 @@ let history = [];
 let historyIndex = -1;
 let editMode = true;
 let bypassActive = false;
+let previewState = { loggedIn: false, premium: false, admin: false };
 
 const MAX_HISTORY = 30;
 
@@ -231,6 +250,9 @@ function handleFile(file) {
         fileInfo.style.display = 'block';
         previewStatus.textContent = file.name;
         bypassActive = false;
+        previewState = { loggedIn: false, premium: false, admin: false };
+        $('pvLoggedIn').checked = false; $('pvPremium').checked = false; $('pvAdmin').checked = false;
+        $('previewStatePanel').style.display = 'none';
         loadHTMLToPreview(currentHTML);
         pushHistory(currentHTML);
         emptyState.style.display = 'none';
@@ -240,159 +262,91 @@ function handleFile(file) {
 }
 
 // ============================================================
-// BYPASS LOGIN — INJECT KE IFRAME
+// PREVIEW STATE — simulasi tampilan LOKAL untuk edit layout
+// (tidak menghubungi server asli, tidak memalsukan status ke backend manapun,
+//  hanya mengubah tampilan di iframe preview offline ini)
 // ============================================================
-function bypassLogin() {
+function togglePreviewPanel() {
     if (!currentHTML) {
         toast('Upload file HTML dulu', 'info');
         return;
     }
-    bypassActive = !bypassActive;
-    if (bypassActive) {
-        toast('🔓 Bypass login diaktifkan', 'ok');
-        loadHTMLToPreview(currentHTML, true);
-    } else {
-        toast('🔒 Bypass dinonaktifkan', 'info');
-        loadHTMLToPreview(currentHTML, false);
-    }
+    const panel = $('previewStatePanel');
+    const showing = panel.style.display !== 'none';
+    panel.style.display = showing ? 'none' : 'block';
+}
+
+function applyPreviewState() {
+    const loggedIn = $('pvLoggedIn').checked;
+    const premium = $('pvPremium').checked;
+    const admin = $('pvAdmin').checked;
+    previewState = { loggedIn, premium, admin };
+    bypassActive = loggedIn || premium || admin; // dipakai saat refresh/undo/redo
+    loadHTMLToPreview(currentHTML);
+    toast('Preview diperbarui', 'info');
 }
 
 // ============================================================
 // LOAD HTML KE IFRAME
 // ============================================================
-function loadHTMLToPreview(html, forceBypass) {
+function loadHTMLToPreview(html) {
     const iframe = previewIframe;
     const doc = iframe.contentDocument || iframe.contentWindow.document;
     doc.open();
 
     let htmlToLoad = html;
 
-    // Kalau bypass aktif, inject script bypass
-    if (forceBypass || bypassActive) {
-        const bypassScript = `
+    if (bypassActive) {
+        const p = previewState;
+        const previewScript = `
 <script>
-// === BYPASS LOGIN (injected by Layout Editor) ===
+// === PREVIEW STATE (simulasi lokal, disuntik oleh Layout Editor) ===
+// Catatan: ini HANYA mengubah tampilan di preview offline ini.
+// Tidak ada request ke server asli / tidak mengubah data akun sungguhan.
 (function() {
-    console.log('🔓 Bypass login injected!');
-    
-    // Cek apakah ada state
-    var checkState = function() {
-        // Coba bypass berbagai kemungkinan
-        if (typeof state !== 'undefined') {
-            state.loggedIn = true;
-            state.name = 'Bypass User';
-            state.credits = 999;
-            state.isSubscribed = true;
-            state.isAdmin = true;
-            state.robloxAccess = true;
-            state.freeUsed = false;
-            console.log('✅ State bypassed:', state);
-            showDashboard();
-            return true;
-        }
-        return false;
-    };
-    
-    function showDashboard() {
+    function apply() {
+        if (typeof state === 'undefined') return false;
+        state.loggedIn = ${p.loggedIn || p.premium || p.admin ? 'true' : 'state.loggedIn'};
+        ${p.premium ? "state.isSubscribed = true;" : ""}
+        ${p.admin ? "state.isAdmin = true;" : ""}
+        if (state.name == null) state.name = 'Preview User';
+
         var mainCard = document.getElementById('mainCard');
-        if (mainCard) {
-            mainCard.classList.remove('hidden');
-            mainCard.style.display = 'flex';
-        }
+        if (mainCard) { mainCard.classList.remove('hidden'); mainCard.style.display = 'flex'; }
         var hero = document.getElementById('loggedOutHero');
         if (hero) hero.classList.add('hidden');
         var loginArea = document.getElementById('loginArea');
         if (loginArea) loginArea.classList.add('hidden');
         var userChip = document.getElementById('userChip');
-        if (userChip) {
-            userChip.classList.remove('hidden');
-            userChip.classList.add('flex');
-        }
+        if (userChip) { userChip.classList.remove('hidden'); userChip.classList.add('flex'); }
         var userName = document.getElementById('userName');
-        if (userName) userName.textContent = 'Bypass User';
-        var creditText = document.getElementById('creditText');
-        if (creditText) creditText.textContent = '999';
-        var quotaText = document.getElementById('quotaText');
-        if (quotaText) quotaText.textContent = 'Unlimited — Bypass Mode';
+        if (userName) userName.textContent = state.name;
         var planBadge = document.getElementById('planBadge');
         if (planBadge) {
-            planBadge.textContent = 'BYPASS';
+            planBadge.textContent = 'PREVIEW';
             planBadge.style.background = 'rgba(251,146,60,.2)';
             planBadge.style.color = '#fbbf24';
             planBadge.style.borderColor = 'rgba(251,146,60,.3)';
         }
-        // Update fungsi render
         if (typeof updateQuotaDisplay === 'function') updateQuotaDisplay();
         if (typeof renderList === 'function') renderList();
         if (typeof updatePresetLockUI === 'function') updatePresetLockUI();
-        console.log('✅ Dashboard ditampilkan!');
+        return true;
     }
-    
-    // Coba langsung
-    if (!checkState()) {
-        // Kalau state belum ada, tunggu sampai siap
+    if (!apply()) {
         var tries = 0;
-        var interval = setInterval(function() {
-            tries++;
-            if (checkState() || tries > 30) {
-                clearInterval(interval);
-                if (tries > 30) console.warn('⚠️ Gagal bypass login, state tidak ditemukan');
-            }
-        }, 200);
+        var iv = setInterval(function(){ tries++; if (apply() || tries > 20) clearInterval(iv); }, 200);
     }
 })();
 <\/script>
 `;
-        // Sisipkan sebelum </body>
-        htmlToLoad = htmlToLoad.replace('</body>', bypassScript + '</body>');
+        htmlToLoad = htmlToLoad.replace('</body>', previewScript + '</body>');
     }
 
     doc.write(htmlToLoad);
     doc.close();
 
-    // Attach events setelah iframe siap
-    setTimeout(() => {
-        attachIframeEvents();
-        // Kalau bypass aktif, coba inject lagi kalau masih belum berhasil
-        if (bypassActive || forceBypass) {
-            try {
-                const doc2 = iframe.contentDocument || iframe.contentWindow.document;
-                if (doc2 && doc2.getElementById('mainCard') && doc2.getElementById('mainCard').classList.contains('hidden')) {
-                    // Inject ulang via eval
-                    const script = doc2.createElement('script');
-                    script.textContent = `
-                        (function() {
-                            if (typeof state !== 'undefined') {
-                                state.loggedIn = true;
-                                state.name = 'Bypass User';
-                                state.credits = 999;
-                                state.isSubscribed = true;
-                                state.isAdmin = true;
-                                state.robloxAccess = true;
-                                var mainCard = document.getElementById('mainCard');
-                                if (mainCard) {
-                                    mainCard.classList.remove('hidden');
-                                    mainCard.style.display = 'flex';
-                                }
-                                var hero = document.getElementById('loggedOutHero');
-                                if (hero) hero.classList.add('hidden');
-                                var loginArea = document.getElementById('loginArea');
-                                if (loginArea) loginArea.classList.add('hidden');
-                                var userChip = document.getElementById('userChip');
-                                if (userChip) {
-                                    userChip.classList.remove('hidden');
-                                    userChip.classList.add('flex');
-                                }
-                                if (typeof updateQuotaDisplay === 'function') updateQuotaDisplay();
-                                if (typeof renderList === 'function') renderList();
-                            }
-                        })();
-                    `;
-                    doc2.body.appendChild(script);
-                }
-            } catch(e) {}
-        }
-    }, 500);
+    setTimeout(() => { attachIframeEvents(); }, 500);
 }
 
 // ============================================================
@@ -545,7 +499,7 @@ function undoAction() {
     if (historyIndex > 0) {
         historyIndex--;
         currentHTML = history[historyIndex];
-        loadHTMLToPreview(currentHTML, bypassActive);
+        loadHTMLToPreview(currentHTML);
         toast('Undo', 'info');
     }
 }
@@ -554,7 +508,7 @@ function redoAction() {
     if (historyIndex < history.length - 1) {
         historyIndex++;
         currentHTML = history[historyIndex];
-        loadHTMLToPreview(currentHTML, bypassActive);
+        loadHTMLToPreview(currentHTML);
         toast('Redo', 'info');
     }
 }
@@ -593,6 +547,9 @@ function resetEditor() {
     history = [];
     historyIndex = -1;
     bypassActive = false;
+    previewState = { loggedIn: false, premium: false, admin: false };
+    $('pvLoggedIn').checked = false; $('pvPremium').checked = false; $('pvAdmin').checked = false;
+    $('previewStatePanel').style.display = 'none';
     toast('Reset selesai', 'info');
 }
 
@@ -606,7 +563,7 @@ function toggleEditMode() {
 
 function refreshPreview() {
     if (currentHTML) {
-        loadHTMLToPreview(currentHTML, bypassActive);
+        loadHTMLToPreview(currentHTML);
     }
 }
 
@@ -653,7 +610,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 console.log('🎨 HTML Layout Editor siap!');
-console.log('💡 Klik 🔓 Bypass Login untuk bypass login di file HTML');
+console.log('💡 Klik 👁️ Preview State untuk simulasi tampilan logged-in secara lokal saat edit layout');
 </script>
 </body>
 </html>
