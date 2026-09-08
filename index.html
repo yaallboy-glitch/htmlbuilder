@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Layout Editor</title>
+    <title>HTML Layout Editor Pro</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
         body{background:#060914;color:#e4e4e7;min-height:100vh;display:flex;flex-direction:column;padding:12px}
-        .topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(19,24,56,.8);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:12px;flex-wrap:wrap;margin-bottom:12px}
-        .topbar h1{font-size:16px;font-weight:800;background:linear-gradient(135deg,#7c5cff,#21d4fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        
+        /* ===== TOPBAR ===== */
+        .topbar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(19,24,56,.8);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:12px;flex-wrap:wrap;margin-bottom:10px}
+        .topbar h1{font-size:15px;font-weight:800;background:linear-gradient(135deg,#7c5cff,#21d4fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .topbar .badge{font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(124,92,255,.15);color:#a78bfa;border:1px solid rgba(124,92,255,.15)}
         .topbar .spacer{flex:1}
-        .btn{padding:6px 12px;border-radius:8px;border:none;font-weight:600;font-size:11px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
+        .btn{padding:5px 10px;border-radius:6px;border:none;font-weight:600;font-size:10px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:3px}
         .btn-primary{background:linear-gradient(135deg,#7c5cff,#21d4fd);color:#fff}
         .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(124,92,255,.3)}
         .btn-ghost{background:rgba(255,255,255,.04);color:#a1a1aa;border:1px solid rgba(255,255,255,.08)}
@@ -22,54 +24,74 @@
         .btn-danger:hover{background:rgba(248,113,113,.2)}
         .btn-warning{background:rgba(251,146,60,.12);color:#fbbf24;border:1px solid rgba(251,146,60,.15)}
         .btn-warning:hover{background:rgba(251,146,60,.2)}
+        .btn-purple{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.15)}
+        .btn-purple:hover{background:rgba(168,85,247,.2)}
 
-        .app-layout{display:grid;grid-template-columns:240px 1fr;gap:12px;flex:1;min-height:0}
-        .panel{background:rgba(19,24,56,.7);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;overflow-y:auto}
-        .panel-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#71717a;margin-bottom:10px}
+        /* ===== LAYOUT ===== */
+        .app-layout{display:grid;grid-template-columns:240px 1fr;gap:10px;flex:1;min-height:0}
+        .panel{background:rgba(19,24,56,.7);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px;overflow-y:auto}
+        .panel-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#71717a;margin-bottom:8px}
+        .panel-divider{height:1px;background:rgba(255,255,255,.06);margin:8px 0}
 
-        .upload-zone{border:2px dashed rgba(255,255,255,.12);border-radius:10px;padding:24px 12px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:12px}
+        /* ===== UPLOAD ZONE ===== */
+        .upload-zone{border:2px dashed rgba(255,255,255,.12);border-radius:10px;padding:20px 12px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:10px}
         .upload-zone:hover{border-color:rgba(124,92,255,.4);background:rgba(124,92,255,.04)}
         .upload-zone.dragover{border-color:#7c5cff;background:rgba(124,92,255,.08)}
-        .upload-zone .icon{font-size:28px;opacity:.3;margin-bottom:4px}
-        .upload-zone .text{font-size:11px;color:#a1a1aa}
+        .upload-zone .icon{font-size:24px;opacity:.3;margin-bottom:2px}
+        .upload-zone .text{font-size:10px;color:#a1a1aa}
         .upload-zone .text b{color:#e4e4e7}
-        .upload-zone .sub{font-size:9px;color:#52525b;margin-top:2px}
+        .upload-zone .sub{font-size:8px;color:#52525b;margin-top:2px}
 
-        .style-group{margin-bottom:10px}
-        .style-group label{display:block;font-size:9px;font-weight:600;color:#71717a;margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
-        .style-group input[type="text"],.style-group input[type="number"],.style-group input[type="color"]{width:100%;padding:5px 8px;background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:5px;color:#e4e4e7;font-size:11px;outline:none;transition:border-color .2s}
+        /* ===== STYLE EDITOR ===== */
+        .style-group{margin-bottom:8px}
+        .style-group label{display:block;font-size:8px;font-weight:600;color:#71717a;margin-bottom:2px;text-transform:uppercase;letter-spacing:.3px}
+        .style-group input[type="text"],.style-group input[type="number"],.style-group input[type="color"]{width:100%;padding:4px 6px;background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:4px;color:#e4e4e7;font-size:10px;outline:none;transition:border-color .2s}
         .style-group input:focus{border-color:rgba(124,92,255,.5)}
-        .style-group .row{display:flex;gap:6px}
+        .style-group .row{display:flex;gap:4px}
         .style-group .row>*{flex:1}
 
+        /* ===== PREVIEW ===== */
         .preview-panel{background:rgba(19,24,56,.7);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
-        .preview-toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(0,0,0,.3);border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0;flex-wrap:wrap}
-        .preview-toolbar .info{font-size:10px;color:#71717a;flex:1}
+        .preview-toolbar{display:flex;align-items:center;gap:4px;padding:6px 10px;background:rgba(0,0,0,.3);border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0;flex-wrap:wrap}
+        .preview-toolbar .info{font-size:9px;color:#71717a;flex:1}
         .preview-toolbar .info b{color:#e4e4e7}
-        .preview-container{flex:1;overflow:auto;padding:10px;background:#12121a;min-height:350px}
-        .preview-container iframe{width:100%;height:100%;min-height:350px;border:none;background:#fff;border-radius:6px}
+        .preview-toolbar .zoom-control{display:flex;align-items:center;gap:4px;font-size:9px;color:#71717a}
+        .preview-toolbar .zoom-control input[type="range"]{width:60px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;outline:none;-webkit-appearance:none}
+        .preview-toolbar .zoom-control input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;background:#7c5cff;border-radius:50%;cursor:pointer}
+        .preview-container{flex:1;overflow:auto;padding:10px;background:#12121a;min-height:350px;position:relative}
+        .preview-container iframe{width:100%;height:100%;min-height:350px;border:none;background:#fff;border-radius:6px;transition:transform .1s}
 
         .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:280px;color:#52525b;text-align:center}
-        .empty-state .icon{font-size:40px;opacity:.2;margin-bottom:8px}
-        .empty-state .title{font-size:14px;font-weight:600;color:#a1a1aa}
-        .empty-state .sub{font-size:11px;margin-top:2px}
+        .empty-state .icon{font-size:36px;opacity:.2;margin-bottom:6px}
+        .empty-state .title{font-size:13px;font-weight:600;color:#a1a1aa}
+        .empty-state .sub{font-size:10px;margin-top:2px}
 
-        #fileInfo{font-size:10px;color:#71717a;margin-bottom:10px;display:none}
-        #fileInfo div{padding:2px 0}
+        #fileInfo{font-size:9px;color:#71717a;margin-bottom:8px;display:none}
+        #fileInfo div{padding:1px 0}
 
-        @media(max-width:768px){.app-layout{grid-template-columns:1fr}.topbar{padding:8px 10px}.topbar h1{font-size:14px}.btn{font-size:10px;padding:5px 10px}}
+        /* ===== PREVIEW STATE PANEL ===== */
+        #previewStatePanel{display:none;margin-bottom:8px;padding:8px 10px;background:rgba(251,146,60,.05);border:1px solid rgba(251,146,60,.12);border-radius:8px}
+        #previewStatePanel label{display:flex;align-items:center;gap:4px;font-size:9px;color:#e4e4e7;margin-bottom:4px;cursor:pointer}
+        #previewStatePanel input[type="checkbox"]{accent-color:#7c5cff;width:12px;height:12px}
+
+        /* ===== RESPONSIVE ===== */
+        @media(max-width:768px){.app-layout{grid-template-columns:1fr}.topbar{padding:6px 8px}.topbar h1{font-size:13px}.btn{font-size:9px;padding:4px 8px}}
+        @media(max-width:480px){.preview-toolbar .zoom-control{display:none}}
     </style>
 </head>
 <body>
 
 <!-- TOPBAR -->
 <header class="topbar">
-    <h1>🎨 HTML Layout Editor</h1>
-    <span class="badge">🔧 Visual</span>
+    <h1>🎨 Layout Editor Pro</h1>
+    <span class="badge">🔧 Drag & Resize</span>
     <span class="spacer"></span>
     <button class="btn btn-ghost" onclick="undoAction()">↩ Undo</button>
     <button class="btn btn-ghost" onclick="redoAction()">↪ Redo</button>
-    <button class="btn btn-warning" onclick="togglePreviewPanel()" title="Simulasi tampilan logged-in untuk keperluan edit layout">👁️ Preview State</button>
+    <button class="btn btn-warning" onclick="togglePreviewPanel()">👁️ State</button>
+    <button class="btn btn-purple" onclick="copySelectedElement()">📋 Copy</button>
+    <button class="btn btn-purple" onclick="pasteElement()">📄 Paste</button>
+    <button class="btn btn-primary" onclick="duplicateSelected()">🔁 Duplicate</button>
     <button class="btn btn-success" onclick="downloadHTML()">⬇ Download</button>
     <button class="btn btn-danger" onclick="resetEditor()">✕ Reset</button>
 </header>
@@ -78,6 +100,7 @@
 <div class="app-layout">
     <!-- PANEL KIRI -->
     <aside class="panel">
+        <!-- Upload -->
         <div class="upload-zone" id="uploadZone">
             <div class="icon">📂</div>
             <div class="text"><b>Klik atau tarik</b> file HTML</div>
@@ -90,67 +113,73 @@
             <div>📦 <span id="fileSize">-</span></div>
         </div>
 
-        <hr style="border-color:rgba(255,255,255,.06);margin:10px 0">
+        <div class="panel-divider"></div>
 
+        <!-- Preview State -->
         <div class="panel-title">👁️ Preview State</div>
-        <div id="previewStatePanel" style="display:none;margin-bottom:10px;padding:10px;background:rgba(251,146,60,.05);border:1px solid rgba(251,146,60,.12);border-radius:8px">
-            <div style="font-size:9px;color:#a1a1aa;margin-bottom:8px;line-height:1.5">
-                Simulasi tampilan <b>hanya di preview lokal ini</b> (tidak login ke server asli). Untuk keperluan edit layout saja.
-            </div>
-            <label style="display:flex;align-items:center;gap:6px;font-size:10px;color:#e4e4e7;margin-bottom:6px;cursor:pointer">
-                <input type="checkbox" id="pvLoggedIn" onchange="applyPreviewState()"> Simulasikan sudah login
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:10px;color:#e4e4e7;margin-bottom:6px;cursor:pointer">
-                <input type="checkbox" id="pvPremium" onchange="applyPreviewState()"> Simulasikan status premium/subscriber
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:10px;color:#e4e4e7;margin-bottom:2px;cursor:pointer">
-                <input type="checkbox" id="pvAdmin" onchange="applyPreviewState()"> Simulasikan akses admin
-            </label>
+        <div id="previewStatePanel">
+            <label><input type="checkbox" id="pvLoggedIn" onchange="applyPreviewState()"> Simulasi sudah login</label>
+            <label><input type="checkbox" id="pvPremium" onchange="applyPreviewState()"> Simulasi premium/subscriber</label>
+            <label><input type="checkbox" id="pvAdmin" onchange="applyPreviewState()"> Simulasi akses admin</label>
         </div>
 
-        <hr style="border-color:rgba(255,255,255,.06);margin:10px 0">
+        <div class="panel-divider"></div>
 
+        <!-- Info Elemen -->
+        <div class="panel-title">📍 Elemen Terpilih</div>
+        <div class="style-group">
+            <input type="text" id="selectedElement" readonly style="background:rgba(255,255,255,.04);color:#71717a;font-size:9px">
+        </div>
+
+        <div class="panel-divider"></div>
+
+        <!-- Edit Style -->
         <div class="panel-title">✏️ Edit Style</div>
-        <div id="styleEditor">
-            <div class="style-group">
-                <label>Elemen terpilih</label>
-                <input type="text" id="selectedElement" readonly style="background:rgba(255,255,255,.04);color:#71717a;font-size:10px">
+        <div class="style-group">
+            <label>Teks</label>
+            <input type="text" id="editText" placeholder="Klik dua kali teks" onchange="applyTextChange()">
+        </div>
+        <div class="style-group">
+            <label>Warna</label>
+            <input type="color" id="editColor" value="#000000" onchange="applyStyleChange('color', this.value)">
+        </div>
+        <div class="style-group">
+            <label>Ukuran Font (px)</label>
+            <input type="number" id="editFontSize" placeholder="16" onchange="applyStyleChange('fontSize', this.value+'px')">
+        </div>
+        <div class="style-group">
+            <label>Background</label>
+            <input type="color" id="editBg" value="#ffffff" onchange="applyStyleChange('backgroundColor', this.value)">
+        </div>
+        <div class="style-group">
+            <div class="row">
+                <div><label>Padding (px)</label><input type="number" id="editPadding" placeholder="0" onchange="applyStyleChange('padding', this.value+'px')"></div>
+                <div><label>Margin (px)</label><input type="number" id="editMargin" placeholder="0" onchange="applyStyleChange('margin', this.value+'px')"></div>
             </div>
-            <div class="style-group">
-                <label>Teks</label>
-                <input type="text" id="editText" placeholder="Klik dua kali teks" onchange="applyTextChange()">
-            </div>
-            <div class="style-group">
-                <label>Warna</label>
-                <input type="color" id="editColor" value="#000000" onchange="applyStyleChange('color', this.value)">
-            </div>
-            <div class="style-group">
-                <label>Ukuran Font (px)</label>
-                <input type="number" id="editFontSize" placeholder="16" onchange="applyStyleChange('fontSize', this.value+'px')">
-            </div>
-            <div class="style-group">
-                <label>Background</label>
-                <input type="color" id="editBg" value="#ffffff" onchange="applyStyleChange('backgroundColor', this.value)">
-            </div>
-            <div class="style-group">
-                <div class="row">
-                    <div><label>Padding (px)</label><input type="number" id="editPadding" placeholder="0" onchange="applyStyleChange('padding', this.value+'px')"></div>
-                    <div><label>Margin (px)</label><input type="number" id="editMargin" placeholder="0" onchange="applyStyleChange('margin', this.value+'px')"></div>
-                </div>
-            </div>
-            <div style="display:flex;gap:6px;margin-top:6px">
-                <button class="btn btn-danger" style="flex:1;padding:5px" onclick="deleteSelected()">🗑 Hapus</button>
-                <button class="btn btn-ghost" style="flex:1;padding:5px" onclick="clearSelection()">✕ Batal</button>
+        </div>
+        <div class="style-group">
+            <div class="row">
+                <div><label>Width (px)</label><input type="number" id="editWidth" placeholder="auto" onchange="applyStyleChange('width', this.value ? this.value+'px' : 'auto')"></div>
+                <div><label>Height (px)</label><input type="number" id="editHeight" placeholder="auto" onchange="applyStyleChange('height', this.value ? this.value+'px' : 'auto')"></div>
             </div>
         </div>
 
-        <div style="margin-top:10px;padding:8px 10px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.12);border-radius:8px;font-size:9px;color:#a1a1aa">
+        <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">
+            <button class="btn btn-danger" style="flex:1;padding:4px;font-size:9px" onclick="deleteSelected()">🗑 Hapus</button>
+            <button class="btn btn-ghost" style="flex:1;padding:4px;font-size:9px" onclick="clearSelection()">✕ Batal</button>
+            <button class="btn btn-purple" style="flex:1;padding:4px;font-size:9px" onclick="duplicateSelected()">🔁 Duplicate</button>
+        </div>
+
+        <div class="panel-divider"></div>
+
+        <div style="padding:6px 8px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.12);border-radius:6px;font-size:8px;color:#a1a1aa;line-height:1.6">
             <b>💡 Cara pakai:</b><br>
-            1. Upload file HTML<br>
-            2. Klik elemen di preview<br>
-            3. Double-click teks untuk edit<br>
-            4. Ubah style di panel kiri<br>
-            5. 👁️ Preview State kalau tampilan utama tersembunyi di balik login (simulasi lokal saja, tidak login sungguhan)
+            • Klik elemen di preview untuk pilih<br>
+            • <b>Drag</b> elemen untuk pindahkan<br>
+            • <b>Drag corner</b> (■) untuk resize<br>
+            • Double-click teks untuk edit<br>
+            • Ctrl+C / Ctrl+V untuk copy-paste<br>
+            • 👁️ State untuk simulasi login
         </div>
     </aside>
 
@@ -158,8 +187,12 @@
     <main class="preview-panel">
         <div class="preview-toolbar">
             <span class="info">📄 <b id="previewStatus">Belum ada file</b></span>
-            <button class="btn btn-ghost" style="padding:3px 8px;font-size:9px" onclick="refreshPreview()">⟳ Refresh</button>
-            <button class="btn btn-ghost" style="padding:3px 8px;font-size:9px" onclick="toggleEditMode()">✏️ Edit Mode</button>
+            <div class="zoom-control">
+                <span id="zoomLabel">100%</span>
+                <input type="range" id="zoomRange" min="25" max="200" value="100" oninput="setZoom(this.value)">
+            </div>
+            <button class="btn btn-ghost" style="padding:2px 8px;font-size:8px" onclick="refreshPreview()">⟳</button>
+            <button class="btn btn-ghost" style="padding:2px 8px;font-size:8px" onclick="toggleEditMode()">✏️</button>
         </div>
         <div class="preview-container" id="previewContainer">
             <div class="empty-state" id="emptyState">
@@ -184,6 +217,11 @@ let historyIndex = -1;
 let editMode = true;
 let bypassActive = false;
 let previewState = { loggedIn: false, premium: false, admin: false };
+let clipboardElement = null;
+let zoomLevel = 100;
+
+// Drag & Resize state
+let dragData = null;
 
 const MAX_HISTORY = 30;
 
@@ -206,6 +244,8 @@ const editFontSize = $('editFontSize');
 const editBg = $('editBg');
 const editPadding = $('editPadding');
 const editMargin = $('editMargin');
+const editWidth = $('editWidth');
+const editHeight = $('editHeight');
 
 // ============================================================
 // UPLOAD
@@ -252,7 +292,6 @@ function handleFile(file) {
         bypassActive = false;
         previewState = { loggedIn: false, premium: false, admin: false };
         $('pvLoggedIn').checked = false; $('pvPremium').checked = false; $('pvAdmin').checked = false;
-        $('previewStatePanel').style.display = 'none';
         loadHTMLToPreview(currentHTML);
         pushHistory(currentHTML);
         emptyState.style.display = 'none';
@@ -262,18 +301,25 @@ function handleFile(file) {
 }
 
 // ============================================================
-// PREVIEW STATE — simulasi tampilan LOKAL untuk edit layout
-// (tidak menghubungi server asli, tidak memalsukan status ke backend manapun,
-//  hanya mengubah tampilan di iframe preview offline ini)
+// ZOOM
+// ============================================================
+function setZoom(val) {
+    zoomLevel = parseInt(val);
+    $('zoomLabel').textContent = zoomLevel + '%';
+    if (previewIframe) {
+        previewIframe.style.transform = 'scale(' + (zoomLevel/100) + ')';
+        previewIframe.style.transformOrigin = 'top left';
+        previewIframe.style.width = (100 / (zoomLevel/100)) + '%';
+    }
+}
+
+// ============================================================
+// PREVIEW STATE
 // ============================================================
 function togglePreviewPanel() {
-    if (!currentHTML) {
-        toast('Upload file HTML dulu', 'info');
-        return;
-    }
+    if (!currentHTML) { toast('Upload file HTML dulu', 'info'); return; }
     const panel = $('previewStatePanel');
-    const showing = panel.style.display !== 'none';
-    panel.style.display = showing ? 'none' : 'block';
+    panel.style.display = panel.style.display !== 'none' ? 'none' : 'block';
 }
 
 function applyPreviewState() {
@@ -281,7 +327,7 @@ function applyPreviewState() {
     const premium = $('pvPremium').checked;
     const admin = $('pvAdmin').checked;
     previewState = { loggedIn, premium, admin };
-    bypassActive = loggedIn || premium || admin; // dipakai saat refresh/undo/redo
+    bypassActive = loggedIn || premium || admin;
     loadHTMLToPreview(currentHTML);
     toast('Preview diperbarui', 'info');
 }
@@ -300,9 +346,6 @@ function loadHTMLToPreview(html) {
         const p = previewState;
         const previewScript = `
 <script>
-// === PREVIEW STATE (simulasi lokal, disuntik oleh Layout Editor) ===
-// Catatan: ini HANYA mengubah tampilan di preview offline ini.
-// Tidak ada request ke server asli / tidak mengubah data akun sungguhan.
 (function() {
     function apply() {
         if (typeof state === 'undefined') return false;
@@ -346,17 +389,21 @@ function loadHTMLToPreview(html) {
     doc.write(htmlToLoad);
     doc.close();
 
-    setTimeout(() => { attachIframeEvents(); }, 500);
+    setTimeout(() => {
+        attachIframeEvents();
+        setZoom($('zoomRange').value);
+    }, 500);
 }
 
 // ============================================================
-// IFRAME EVENTS
+// DRAG & DROP + RESIZE (di iframe)
 // ============================================================
 function attachIframeEvents() {
     const iframe = previewIframe;
     const doc = iframe.contentDocument || iframe.contentWindow.document;
     if (!doc) return;
 
+    // === KLIK ===
     doc.addEventListener('click', function(e) {
         if (!editMode) return;
         const el = e.target;
@@ -366,6 +413,7 @@ function attachIframeEvents() {
         e.stopPropagation();
     });
 
+    // === DOUBLE-CLICK ===
     doc.addEventListener('dblclick', function(e) {
         if (!editMode) return;
         const el = e.target;
@@ -381,23 +429,192 @@ function attachIframeEvents() {
         e.stopPropagation();
     });
 
+    // === HOVER ===
     doc.addEventListener('mouseover', function(e) {
         if (!editMode) return;
         const el = e.target;
-        if (el !== doc.body && el !== doc.documentElement) {
-            el.style.outline = '2px solid rgba(124,92,255,.3)';
+        if (el !== doc.body && el !== doc.documentElement && el !== selectedElement) {
+            el.style.outline = '2px solid rgba(124,92,255,.2)';
             el.style.outlineOffset = '1px';
         }
     });
 
     doc.addEventListener('mouseout', function(e) {
         const el = e.target;
-        el.style.outline = 'none';
+        if (el !== selectedElement) {
+            el.style.outline = 'none';
+        }
     });
 
+    // === DRAG UNTUK MENGESER ===
+    doc.addEventListener('mousedown', function(e) {
+        if (!editMode) return;
+        const el = e.target;
+        if (el === selectedElement || (selectedElement && selectedElement.contains(el))) {
+            const target = selectedElement;
+            const rect = target.getBoundingClientRect();
+            // Jangan drag kalau di corner resize
+            if (e.target.closest('.resize-handle')) return;
+            dragData = {
+                element: target,
+                offsetX: e.clientX - rect.left,
+                offsetY: e.clientY - rect.top,
+                startX: rect.left,
+                startY: rect.top,
+                moved: false
+            };
+            e.preventDefault();
+        }
+    });
+
+    doc.addEventListener('mousemove', function(e) {
+        if (!dragData || !editMode) return;
+        const iframeRect = iframe.getBoundingClientRect();
+        const docRect = doc.body.getBoundingClientRect();
+        const scale = iframeRect.width / docRect.width;
+
+        const newLeft = (e.clientX - iframeRect.left) / scale - dragData.offsetX;
+        const newTop = (e.clientY - iframeRect.top) / scale - dragData.offsetY;
+
+        dragData.element.style.position = 'relative';
+        dragData.element.style.left = newLeft + 'px';
+        dragData.element.style.top = newTop + 'px';
+        dragData.element.style.margin = '0';
+        dragData.moved = true;
+
+        // Tampilkan handle resize
+        showResizeHandles(dragData.element);
+    });
+
+    doc.addEventListener('mouseup', function(e) {
+        if (dragData && dragData.moved) {
+            syncHTMLFromIframe();
+            pushHistory(currentHTML);
+            toast('Elemen dipindahkan', 'info');
+        }
+        dragData = null;
+        // Hapus resize handles setelah drag
+        doc.querySelectorAll('.resize-handle').forEach(h => h.remove());
+    });
+
+    // === RESIZE HANDLES ===
+    function showResizeHandles(el) {
+        // Hapus handle lama
+        doc.querySelectorAll('.resize-handle').forEach(h => h.remove());
+        if (!el) return;
+
+        const handles = ['se', 'sw', 'ne', 'nw', 'e', 'w', 'n', 's'];
+        handles.forEach(dir => {
+            const handle = doc.createElement('div');
+            handle.className = 'resize-handle';
+            handle.dataset.dir = dir;
+            Object.assign(handle.style, {
+                position: 'absolute',
+                width: '10px',
+                height: '10px',
+                background: '#7c5cff',
+                border: '1px solid #fff',
+                borderRadius: '50%',
+                zIndex: '99999',
+                cursor: dir + '-resize',
+                pointerEvents: 'auto',
+                boxShadow: '0 0 8px rgba(124,92,255,.6)'
+            });
+
+            // Posisi handle
+            const rect = el.getBoundingClientRect();
+            const docRect = doc.body.getBoundingClientRect();
+            const scale = docRect.width / doc.body.scrollWidth || 1;
+
+            const x = (rect.left - docRect.left) / scale;
+            const y = (rect.top - docRect.top) / scale;
+            const w = rect.width / scale;
+            const h = rect.height / scale;
+
+            let left = 0, top = 0;
+            if (dir.includes('e')) left = w - 5;
+            else if (dir.includes('w')) left = -5;
+            else left = w/2 - 5;
+
+            if (dir.includes('s')) top = h - 5;
+            else if (dir.includes('n')) top = -5;
+            else top = h/2 - 5;
+
+            handle.style.left = (x + left) + 'px';
+            handle.style.top = (y + top) + 'px';
+
+            // Event resize
+            let resizeData = null;
+            handle.addEventListener('mousedown', function(ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                const startX = ev.clientX;
+                const startY = ev.clientY;
+                const startW = el.offsetWidth;
+                const startH = el.offsetHeight;
+                const dir = this.dataset.dir;
+
+                function onMove(me) {
+                    const dx = (me.clientX - startX) / scale;
+                    const dy = (me.clientY - startY) / scale;
+                    let newW = startW, newH = startH, newL = 0, newT = 0;
+
+                    if (dir.includes('e')) newW = Math.max(20, startW + dx);
+                    if (dir.includes('w')) { newW = Math.max(20, startW - dx); newL = dx; }
+                    if (dir.includes('s')) newH = Math.max(20, startH + dy);
+                    if (dir.includes('n')) { newH = Math.max(20, startH - dy); newT = dy; }
+
+                    el.style.width = newW + 'px';
+                    el.style.height = newH + 'px';
+                    if (newL) el.style.left = (parseFloat(el.style.left) + newL) + 'px';
+                    if (newT) el.style.top = (parseFloat(el.style.top) + newT) + 'px';
+                    el.style.position = 'relative';
+
+                    // Update handle positions
+                    showResizeHandles(el);
+                }
+
+                function onUp() {
+                    doc.removeEventListener('mousemove', onMove);
+                    doc.removeEventListener('mouseup', onUp);
+                    syncHTMLFromIframe();
+                    pushHistory(currentHTML);
+                    toast('Elemen di-resize', 'info');
+                }
+
+                doc.addEventListener('mousemove', onMove);
+                doc.addEventListener('mouseup', onUp);
+            });
+
+            el.parentNode.appendChild(handle);
+        });
+    }
+
+    // Tampilkan handle saat elemen dipilih
+    const origSelect = selectElement;
+    selectElement = function(el) {
+        origSelect(el);
+        if (el) {
+            setTimeout(() => showResizeHandles(el), 100);
+        }
+    };
+
+    // === KEYBOARD ===
     doc.addEventListener('keydown', function(e) {
         if (e.key === 'Delete' && selectedElement) {
             deleteSelected();
+            e.preventDefault();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+            copySelectedElement();
+            e.preventDefault();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+            pasteElement();
+            e.preventDefault();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+            duplicateSelected();
             e.preventDefault();
         }
     });
@@ -421,6 +638,8 @@ function selectElement(el) {
     editBg.value = rgbToHex(computed.backgroundColor || '#ffffff');
     editPadding.value = parseInt(computed.padding) || '';
     editMargin.value = parseInt(computed.margin) || '';
+    editWidth.value = computed.width !== 'auto' ? parseInt(computed.width) : '';
+    editHeight.value = computed.height !== 'auto' ? parseInt(computed.height) : '';
 
     el.style.outline = '2px solid #7c5cff';
     el.style.outlineOffset = '2px';
@@ -433,6 +652,9 @@ function clearSelection() {
     }
     selectedElementInput.value = '';
     editText.value = '';
+    // Hapus resize handles
+    const doc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+    if (doc) doc.querySelectorAll('.resize-handle').forEach(h => h.remove());
 }
 
 function rgbToHex(rgb) {
@@ -451,6 +673,14 @@ function applyStyleChange(prop, value) {
     selectedElement.style[prop] = value;
     syncHTMLFromIframe();
     pushHistory(currentHTML);
+    // Update handle positions
+    const doc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+    if (doc) {
+        setTimeout(() => {
+            doc.querySelectorAll('.resize-handle').forEach(h => h.remove());
+            showResizeHandles(selectedElement);
+        }, 100);
+    }
 }
 
 function applyTextChange() {
@@ -465,14 +695,58 @@ function deleteSelected() {
     if (confirm('Hapus elemen ini?')) {
         const parent = selectedElement.parentNode;
         if (parent && parent !== document.body) {
-            selectedElement.remove();
+            const el = selectedElement;
             selectedElement = null;
+            el.remove();
             syncHTMLFromIframe();
             pushHistory(currentHTML);
             clearSelection();
             toast('Elemen dihapus', 'ok');
         }
     }
+}
+
+// ============================================================
+// COPY / PASTE / DUPLICATE
+// ============================================================
+function copySelectedElement() {
+    if (!selectedElement) { toast('Pilih elemen dulu', 'info'); return; }
+    const doc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+    clipboardElement = selectedElement.cloneNode(true);
+    toast('✅ Elemen disalin', 'ok');
+}
+
+function pasteElement() {
+    if (!clipboardElement) { toast('Tidak ada elemen di clipboard', 'info'); return; }
+    const doc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+    const parent = selectedElement ? selectedElement.parentNode : doc.body;
+    if (!parent) return;
+    const clone = clipboardElement.cloneNode(true);
+    clone.style.position = 'relative';
+    clone.style.left = '10px';
+    clone.style.top = '10px';
+    parent.appendChild(clone);
+    syncHTMLFromIframe();
+    pushHistory(currentHTML);
+    selectElement(clone);
+    toast('📄 Elemen ditempel', 'ok');
+}
+
+function duplicateSelected() {
+    if (!selectedElement) { toast('Pilih elemen dulu', 'info'); return; }
+    const doc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+    const parent = selectedElement.parentNode;
+    if (!parent) return;
+    const clone = selectedElement.cloneNode(true);
+    const rect = selectedElement.getBoundingClientRect();
+    clone.style.position = 'relative';
+    clone.style.left = '10px';
+    clone.style.top = '10px';
+    parent.appendChild(clone);
+    syncHTMLFromIframe();
+    pushHistory(currentHTML);
+    selectElement(clone);
+    toast('🔁 Elemen digandakan', 'ok');
 }
 
 // ============================================================
@@ -500,7 +774,7 @@ function undoAction() {
         historyIndex--;
         currentHTML = history[historyIndex];
         loadHTMLToPreview(currentHTML);
-        toast('Undo', 'info');
+        toast('↩ Undo', 'info');
     }
 }
 
@@ -509,7 +783,7 @@ function redoAction() {
         historyIndex++;
         currentHTML = history[historyIndex];
         loadHTMLToPreview(currentHTML);
-        toast('Redo', 'info');
+        toast('↪ Redo', 'info');
     }
 }
 
@@ -528,7 +802,7 @@ function downloadHTML() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    toast('HTML di-download ✅', 'ok');
+    toast('⬇ HTML di-download ✅', 'ok');
 }
 
 // ============================================================
@@ -544,12 +818,14 @@ function resetEditor() {
     previewIframe.style.display = 'none';
     previewIframe.src = 'about:blank';
     clearSelection();
+    clipboardElement = null;
     history = [];
     historyIndex = -1;
     bypassActive = false;
     previewState = { loggedIn: false, premium: false, admin: false };
     $('pvLoggedIn').checked = false; $('pvPremium').checked = false; $('pvAdmin').checked = false;
     $('previewStatePanel').style.display = 'none';
+    setZoom(100);
     toast('Reset selesai', 'info');
 }
 
@@ -558,6 +834,11 @@ function resetEditor() {
 // ============================================================
 function toggleEditMode() {
     editMode = !editMode;
+    if (!editMode) {
+        const doc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+        if (doc) doc.querySelectorAll('.resize-handle').forEach(h => h.remove());
+        if (selectedElement) selectedElement.style.outline = 'none';
+    }
     toast(editMode ? '✏️ Edit Mode ON' : '👀 View Mode', 'info');
 }
 
@@ -575,7 +856,7 @@ function toast(msg, type = 'info') {
     const el = document.createElement('div');
     el.style.cssText = `
         position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-        padding: 8px 16px; border-radius: 8px; font-size: 11px; font-weight: 600;
+        padding: 6px 14px; border-radius: 6px; font-size: 10px; font-weight: 600;
         color: #fff; background: ${colors[type] || '#52525b'};
         box-shadow: 0 8px 30px rgba(0,0,0,.5); z-index: 9999;
         animation: fadeInUp .25s ease;
@@ -589,12 +870,19 @@ function toast(msg, type = 'info') {
     }, 2000);
 }
 
-// Tambahkan style
+// Tambahkan style untuk animation
 const styleSheet = document.createElement('style');
 styleSheet.textContent = `
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateX(-50%) translateY(20px); }
         to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    .resize-handle {
+        pointer-events: auto !important;
+    }
+    .resize-handle:hover {
+        transform: scale(1.3);
+        box-shadow: 0 0 12px rgba(124,92,255,.8) !important;
     }
 `;
 document.head.appendChild(styleSheet);
@@ -609,8 +897,8 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') { clearSelection(); }
 });
 
-console.log('🎨 HTML Layout Editor siap!');
-console.log('💡 Klik 👁️ Preview State untuk simulasi tampilan logged-in secara lokal saat edit layout');
+console.log('🎨 Layout Editor Pro siap!');
+console.log('💡 Fitur: Klik, Drag untuk pindah, Corner untuk resize, Copy/Paste, Duplicate');
 </script>
 </body>
 </html>
