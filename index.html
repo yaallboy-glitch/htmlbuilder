@@ -9,11 +9,28 @@
     <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/all.min.css">
     
     <style>
         /* ===== RESET ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ===== ICONS (inline SVG, always white) ===== */
+        .ico, .i-svg {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0;
+        }
+        .i-svg {
+            width: 1em;
+            height: 1em;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .ico.dim .i-svg { opacity: .45; }
+        .ico.spin .i-svg { animation: icoSpin .8s linear infinite; }
+        .i-svg.dim-cover { opacity: .3; }
+        .i-svg.spin-icon { animation: icoSpin .8s linear infinite; }
+        @keyframes icoSpin { to { transform: rotate(360deg); } }
         :root {
             --bg: #0a0a0a;
             --glass: rgba(255,255,255,.04);
@@ -670,7 +687,7 @@
     <!-- HEADER -->
     <header class="header">
         <div class="brand">
-            <div class="logo"><i class="fas fa-headphones"></i></div>
+            <div class="logo"><span class="ico" data-icon="headphones"></span></div>
             <div>
                 <h1>Aurora<span>Sound</span></h1>
                 <div style="display:flex;gap:4px;margin-top:-2px;">
@@ -694,7 +711,7 @@
 
             <!-- UPLOAD -->
             <div class="upload-zone" id="uploadZone">
-                <div class="icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                <div class="icon"><span class="ico dim" data-icon="upload"></span></div>
                 <div class="title"><b>Klik atau tarik</b> file audio</div>
                 <div class="sub">MP3, WAV, FLAC, OGG, M4A, AAC, OPUS</div>
                 <div class="formats">
@@ -714,7 +731,7 @@
 
             <!-- COVER -->
             <div class="cover" id="coverArt">
-                <div class="placeholder"><i class="fas fa-compact-disc"></i></div>
+                <div class="placeholder"><span class="ico dim" data-icon="disc" style="font-size:1em"></span></div>
                 <div class="spectrum" id="spectrum"></div>
             </div>
 
@@ -727,10 +744,10 @@
 
             <!-- CONTROLS -->
             <div class="controls">
-                <button class="btn" id="prevBtn" disabled><i class="fas fa-backward-step"></i></button>
-                <button class="btn play" id="playBtn" disabled><i class="fas fa-play" id="playIcon"></i></button>
-                <button class="btn" id="nextBtn" disabled><i class="fas fa-forward-step"></i></button>
-                <button class="btn" id="loopBtn" onclick="toggleLoop()"><i class="fas fa-rotate-right"></i></button>
+                <button class="btn" id="prevBtn" disabled><span class="ico" data-icon="skipBack"></span></button>
+                <button class="btn play" id="playBtn" disabled><span class="ico" id="playIcon" data-icon="play"></span></button>
+                <button class="btn" id="nextBtn" disabled><span class="ico" data-icon="skipForward"></span></button>
+                <button class="btn" id="loopBtn" onclick="toggleLoop()"><span class="ico" data-icon="repeat"></span></button>
             </div>
 
             <!-- PROGRESS -->
@@ -756,20 +773,20 @@
             <!-- BOTTOM -->
             <div class="bottom-bar">
                 <div class="volume">
-                    <i class="fas fa-volume-low"></i>
+                    <span class="ico" data-icon="volumeLow"></span>
                     <input type="range" id="volumeSlider" min="0" max="100" value="80">
-                    <i class="fas fa-volume-high"></i>
+                    <span class="ico" data-icon="volumeHigh"></span>
                 </div>
                 <div class="actions">
-                    <button class="btn-sm studio" id="studioBtn" onclick="convertToStudio()"><i class="fas fa-wand-magic-sparkles"></i> Studio</button>
-                    <button class="btn-sm" onclick="downloadAudio()"><i class="fas fa-download"></i></button>
-                    <button class="btn-sm danger" onclick="resetPlayer()"><i class="fas fa-trash"></i></button>
+                    <button class="btn-sm studio" id="studioBtn" onclick="convertToStudio()"><span class="ico" data-icon="sparkles"></span> Studio</button>
+                    <button class="btn-sm" onclick="downloadAudio()"><span class="ico" data-icon="download"></span></button>
+                    <button class="btn-sm danger" onclick="resetPlayer()"><span class="ico" data-icon="trash"></span></button>
                 </div>
             </div>
 
             <!-- STATUS -->
             <div class="status-text" id="statusText">
-                <i class="fas fa-circle info"></i> Siap memutar audio
+                <span class="ico" data-icon="dot"></span> Siap memutar audio
             </div>
         </div>
 
@@ -793,6 +810,40 @@
 // ============================================================
 const { FFmpeg } = FFmpegWASM;
 const { toBlobURL, fetchFile } = FFmpegUtil;
+
+// ============================================================
+// ICONS (inline SVG — no external font/CDN dependency, always white)
+// ============================================================
+const ICON_PATHS = {
+    headphones: '<path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><rect x="1" y="15" width="4.5" height="7" rx="1.5"></rect><rect x="18.5" y="15" width="4.5" height="7" rx="1.5"></rect>',
+    upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line>',
+    disc: '<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="2.5"></circle>',
+    skipBack: '<polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line>',
+    skipForward: '<polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line>',
+    repeat: '<polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path>',
+    volumeLow: '<polygon points="10 5 5 9 1 9 1 15 5 15 10 19 10 5"></polygon><path d="M15 8.5a5 5 0 0 1 0 7"></path>',
+    volumeHigh: '<polygon points="10 5 5 9 1 9 1 15 5 15 10 19 10 5"></polygon><path d="M15 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a10 10 0 0 1 0 13"></path>',
+    sparkles: '<path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M4.9 4.9l2.8 2.8"></path><path d="M16.3 16.3l2.8 2.8"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="M4.9 19.1l2.8-2.8"></path><path d="M16.3 7.7l2.8-2.8"></path>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>',
+    trash: '<polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>',
+    checkCircle: '<path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"></path><polyline points="22 4 12 14.1 9 11.1"></polyline>',
+    alertCircle: '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>',
+    inbox: '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>',
+    loader: '<line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>'
+};
+function icon(name, extraClass) {
+    const cls = extraClass ? ' ' + extraClass : '';
+    if (name === 'play') return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
+    if (name === 'pause') return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
+    if (name === 'dot') return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="6"></circle></svg>`;
+    const body = ICON_PATHS[name] || '';
+    return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+}
+function initIcons(root) {
+    (root || document).querySelectorAll('[data-icon]').forEach(el => {
+        el.innerHTML = icon(el.getAttribute('data-icon'));
+    });
+}
 
 // ============================================================
 // DOM REFS
@@ -863,8 +914,8 @@ function toast(msg, type = 'info') {
     const wrap = $('toastWrap');
     const el = document.createElement('div');
     el.className = 'toast-item ' + type;
-    const icons = { ok: 'fa-check-circle', err: 'fa-exclamation-circle', info: 'fa-info-circle' };
-    el.innerHTML = `<span class="icon"><i class="fas ${icons[type] || icons.info}"></i></span><span>${msg}</span>`;
+    const iconName = { ok: 'checkCircle', err: 'alertCircle', info: 'alertCircle' };
+    el.innerHTML = `<span class="icon">${icon(iconName[type] || iconName.info)}</span><span>${msg}</span>`;
     wrap.appendChild(el);
     setTimeout(() => { if (el.parentNode) el.remove(); }, 2800);
 }
@@ -968,9 +1019,8 @@ function stopSpectrum() {
 // SET STATUS
 // ============================================================
 function setStatus(msg, type = 'info') {
-    const icons = { ok: 'fa-check-circle', err: 'fa-exclamation-circle', info: 'fa-circle' };
-    const colors = { ok: 'ok', err: 'err', info: 'info' };
-    statusText.innerHTML = `<i class="fas ${icons[type] || icons.info} ${colors[type] || 'info'}"></i> ${msg}`;
+    const iconName = { ok: 'checkCircle', err: 'alertCircle', info: 'dot' };
+    statusText.innerHTML = `${icon(iconName[type] || iconName.info)} ${msg}`;
     statusLabel.textContent = msg;
     statusDot.className = 'dot' + (type === 'ok' ? ' active' : '');
 }
@@ -990,6 +1040,7 @@ async function bootFFmpeg() {
         isReady = true;
         toast('Engine siap', 'ok');
         setStatus('Siap memutar audio', 'ok');
+        processAutoConvertQueue();
     } catch (e) {
         setStatus('Gagal load engine', 'err');
         toast('Gagal load engine', 'err');
@@ -1003,7 +1054,7 @@ function renderPlaylist() {
     if (!items.length) {
         playlist.innerHTML = `
             <div class="playlist-empty">
-                <i class="fas fa-inbox"></i>
+                ${icon('inbox')}
                 <span>Belum ada lagu</span>
             </div>
         `;
@@ -1022,7 +1073,7 @@ function renderPlaylist() {
                     <div class="meta">${formatSize(it.size)}</div>
                 </div>
                 <span class="status-icon ${playing}">
-                    ${playing ? '<i class="fas fa-volume-low"></i>' : ''}
+                    ${playing ? icon('volumeLow') : ''}
                 </span>
             </div>
         `;
@@ -1051,12 +1102,37 @@ async function addFiles(files) {
             isStudio: false
         });
         toast('+ ' + file.name, 'ok');
+        queueAutoConvert(items.length - 1);
     }
-    if (items.length === 1) {
+    if (currentIndex === -1 && items.length) {
         currentIndex = 0;
         await loadItem(0);
     }
     renderPlaylist();
+}
+
+// ============================================================
+// AUTO-CONVERT ON UPLOAD (lossless, best quality)
+// ============================================================
+let autoConvertQueue = [];
+let isAutoConverting = false;
+
+function queueAutoConvert(index) {
+    autoConvertQueue.push(index);
+    processAutoConvertQueue();
+}
+
+async function processAutoConvertQueue() {
+    if (isAutoConverting || !isReady) return;
+    isAutoConverting = true;
+    while (autoConvertQueue.length) {
+        const idx = autoConvertQueue.shift();
+        const it = items[idx];
+        if (it && !it.isStudio) {
+            await convertItemToStudio(idx, { silent: false, auto: true });
+        }
+    }
+    isAutoConverting = false;
 }
 
 // ============================================================
@@ -1106,7 +1182,7 @@ function updateUI(it) {
     statusBadge.className = 'badge';
     playBtn.disabled = false;
     const cover = coverArt.querySelector('.placeholder');
-    cover.innerHTML = '<i class="fas fa-headphones" style="color:#333;"></i>';
+    cover.innerHTML = icon('headphones');
     cover.style.fontSize = '40px';
     bindAudioEvents();
     if (it.blob) {
@@ -1129,7 +1205,7 @@ function playFromPlaylist(index) {
 function bindAudioEvents() {
     audioPlayer.onplay = () => {
         isPlaying = true;
-        playIcon.className = 'fas fa-pause';
+        playIcon.innerHTML = icon('pause');
         statusBadge.textContent = '▶️ Diputar';
         statusBadge.className = 'badge playing';
         if (!spectrum.classList.contains('active')) { initSpectrum(); startSpectrum(); }
@@ -1138,7 +1214,7 @@ function bindAudioEvents() {
     };
     audioPlayer.onpause = () => {
         isPlaying = false;
-        playIcon.className = 'fas fa-play';
+        playIcon.innerHTML = icon('play');
         statusBadge.textContent = '⏸️ Dijeda';
         statusBadge.className = 'badge';
         renderPlaylist();
@@ -1156,7 +1232,7 @@ function bindAudioEvents() {
     };
     audioPlayer.onended = () => {
         if (isLooping) { audioPlayer.currentTime = 0; audioPlayer.play(); return; }
-        playIcon.className = 'fas fa-play';
+        playIcon.innerHTML = icon('play');
         statusBadge.textContent = '● Selesai';
         statusBadge.className = 'badge';
         stopSpectrum();
@@ -1203,24 +1279,39 @@ function setEQ(preset) {
 }
 
 // ============================================================
-// CONVERT TO STUDIO
+// CONVERT TO STUDIO — maximal lossless FFmpeg (32-bit float PCM WAV)
 // ============================================================
-async function convertToStudio() {
-    if (!currentFile) { toast('Upload audio dulu', 'info'); return; }
+function manualConvertToStudio() {
+    if (currentIndex < 0 || !items[currentIndex]) { toast('Upload audio dulu', 'info'); return; }
     if (!isReady) { toast('Engine belum siap', 'info'); return; }
+    convertItemToStudio(currentIndex, { silent: false, auto: false });
+}
+// kept for backward-compat with existing onclick="convertToStudio()"
+function convertToStudio() { manualConvertToStudio(); }
+
+async function convertItemToStudio(index, opts) {
+    opts = opts || {};
+    const it = items[index];
+    if (!it || !ffmpeg) return;
+    const isCurrent = index === currentIndex;
     const btn = $('studioBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    toast('Mengonversi ke studio...', 'info');
-    setStatus('Mengonversi...', 'info');
-    statusBadge.textContent = '🔄 Converting';
-    statusBadge.className = 'badge';
+
+    if (isCurrent) {
+        btn.disabled = true;
+        btn.innerHTML = icon('loader', 'spin-icon');
+        statusBadge.textContent = '🔄 Converting';
+        statusBadge.className = 'badge';
+    }
+    if (!opts.silent) toast((opts.auto ? 'Auto-render lossless: ' : 'Mengonversi: ') + it.name, 'info');
+    setStatus('Rendering lossless: ' + it.name, 'info');
+
+    const inputName = `in_${index}_${Date.now()}`;
+    const outputName = `out_${index}_${Date.now()}.wav`;
 
     try {
-        const inputName = 'input_' + currentFile.name;
-        const outputName = 'output_' + Date.now() + '.wav';
-        const info = await getAudioInfo(currentFile);
-        const sr = info.sampleRate || 44100;
+        const info = await getAudioInfo(it.file);
+        // Maximal lossless output: never downsample below source rate, minimum 48kHz.
+        const outSr = Math.max(48000, info.sampleRate || 44100);
         const eq = EQ_PRESETS[currentEQ] || EQ_PRESETS.flat;
 
         const filter = [
@@ -1228,63 +1319,77 @@ async function convertToStudio() {
             `equalizer=g=${eq.mid}:f=1000:width_type=q:w=1`,
             `treble=g=${eq.high}:f=3200`,
             `loudnorm=I=-16:TP=-1.5:LRA=14`,
-            `aresample=48000:filter_size=128:cutoff=0.995`,
-            `alimiter=limit=0.97:attack=3:release=50`
+            `aresample=${outSr}:filter_size=256:cutoff=0.999:phase_shift=10`,
+            `alimiter=limit=0.98:attack=3:release=50`
         ].join(',');
 
-        await ffmpeg.writeFile(inputName, await fetchFile(currentFile));
+        await ffmpeg.writeFile(inputName, await fetchFile(it.file));
         ffmpeg.on('progress', ({ progress }) => {
             const pct = Math.min(100, Math.round(progress * 100));
-            setStatus(`Convert ${pct}%`, 'info');
+            setStatus(`Rendering lossless ${pct}% — ${it.name}`, 'info');
         });
         await ffmpeg.exec([
             '-i', inputName,
             '-af', filter,
             '-map_metadata', '-1',
             '-fflags', '+bitexact',
-            '-c:a', 'pcm_s24le',
-            '-ar', '48000',
+            '-c:a', 'pcm_f32le',   // 32-bit float PCM — maximum lossless fidelity
+            '-ar', String(outSr),
             '-y', outputName
         ]);
         const data = await ffmpeg.readFile(outputName);
         const blob = new Blob([data.buffer], { type: 'audio/wav' });
+        const outInfo = await getAudioInfo(blob);
 
-        // Update item
-        const it = items[currentIndex];
+        const oldItemUrl = it.url;
         it.blob = blob;
         it.isStudio = true;
         it.url = URL.createObjectURL(blob);
-        if (currentUrl) URL.revokeObjectURL(currentUrl);
-        currentUrl = it.url;
-        currentBlob = blob;
-        isStudioConverted = true;
-        audioPlayer.src = currentUrl;
-        audioPlayer.load();
+        it.sampleRate = outSr;
+        it.size = blob.size;
+        it.duration = outInfo.duration || it.duration;
 
-        const outInfo = await getAudioInfo(blob);
-        fileSampleRate.textContent = '48000Hz (Studio)';
-        fileDuration.textContent = formatDuration(outInfo.duration);
-        fileSize.textContent = formatSize(blob.size);
-        songArtist.textContent = '48kHz · 24-bit WAV · ' + formatSize(blob.size);
-        songTitle.textContent = it.name + ' [Studio]';
+        if (isCurrent) {
+            const wasPlaying = !audioPlayer.paused;
+            const resumeAt = audioPlayer.currentTime || 0;
+            if (currentUrl) URL.revokeObjectURL(currentUrl);
+            currentUrl = it.url;
+            currentBlob = blob;
+            isStudioConverted = true;
+            audioPlayer.src = currentUrl;
+            audioPlayer.load();
+            if (wasPlaying) {
+                audioPlayer.currentTime = resumeAt;
+                audioPlayer.play().catch(() => {});
+            }
+            fileSampleRate.textContent = outSr + 'Hz (Studio 32-bit float)';
+            fileDuration.textContent = formatDuration(outInfo.duration);
+            fileSize.textContent = formatSize(blob.size);
+            songArtist.textContent = (outSr / 1000) + 'kHz · 32-bit float WAV · ' + formatSize(blob.size);
+            songTitle.textContent = it.name + ' [Studio]';
+            statusBadge.textContent = '✅ Studio';
+            statusBadge.className = 'badge';
+        } else if (oldItemUrl) {
+            URL.revokeObjectURL(oldItemUrl);
+        }
 
-        toast('✅ Studio selesai! 24-bit 48kHz', 'ok');
-        setStatus('Studio grade siap', 'ok');
-        statusBadge.textContent = '✅ Studio';
-        statusBadge.className = 'badge';
+        toast('✅ ' + it.name + ' — lossless ' + (outSr / 1000) + 'kHz/32-bit siap', 'ok');
+        setStatus('Studio grade siap: ' + it.name, 'ok');
         renderPlaylist();
         await ffmpeg.deleteFile(inputName).catch(() => {});
         await ffmpeg.deleteFile(outputName).catch(() => {});
 
     } catch (e) {
-        toast('Gagal: ' + e.message, 'err');
-        setStatus('Gagal convert', 'err');
-        statusBadge.textContent = '❌ Error';
-        statusBadge.className = 'badge';
+        toast('Gagal render ' + it.name + ': ' + e.message, 'err');
+        setStatus('Gagal convert: ' + it.name, 'err');
+        if (isCurrent) { statusBadge.textContent = '❌ Error'; statusBadge.className = 'badge'; }
         console.error(e);
     }
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Studio';
+
+    if (isCurrent) {
+        btn.disabled = false;
+        btn.innerHTML = icon('sparkles') + ' Studio';
+    }
 }
 
 // ============================================================
@@ -1311,6 +1416,7 @@ function resetPlayer() {
     if (!confirm('Reset pemutar?')) return;
     items.forEach(it => { if (it.url) URL.revokeObjectURL(it.url); });
     items = [];
+    autoConvertQueue = [];
     currentIndex = -1;
     currentFile = null;
     currentBlob = null;
@@ -1324,12 +1430,12 @@ function resetPlayer() {
     statusBadge.textContent = '● Siap';
     statusBadge.className = 'badge';
     playBtn.disabled = true;
-    playIcon.className = 'fas fa-play';
+    playIcon.innerHTML = icon('play');
     progressFill.style.width = '0%';
     currentTime.textContent = '0:00';
     totalTime.textContent = '0:00';
     const cover = coverArt.querySelector('.placeholder');
-    cover.innerHTML = '<i class="fas fa-compact-disc"></i>';
+    cover.innerHTML = icon('disc');
     cover.style.fontSize = '48px';
     stopSpectrum();
     setStatus('Reset selesai', 'info');
@@ -1369,6 +1475,7 @@ document.addEventListener('keydown', e => {
 // ============================================================
 // INIT
 // ============================================================
+initIcons();
 initSpectrum();
 bootFFmpeg();
 renderPlaylist();
