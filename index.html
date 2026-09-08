@@ -1051,6 +1051,8 @@ async function bootFFmpeg() {
 // RENDER PLAYLIST
 // ============================================================
 function renderPlaylist() {
+    prevBtn.disabled = items.length < 2;
+    nextBtn.disabled = items.length < 2;
     if (!items.length) {
         playlist.innerHTML = `
             <div class="playlist-empty">
@@ -1099,6 +1101,7 @@ async function addFiles(files) {
             sampleRate: info.sampleRate || 44100,
             blob: null,
             url: null,
+            rawUrl: URL.createObjectURL(file), // playable segera, tanpa menunggu render selesai
             isStudio: false
         });
         toast('+ ' + file.name, 'ok');
@@ -1129,12 +1132,10 @@ async function processAutoConvertQueue() {
         const idx = autoConvertQueue.shift();
         const it = items[idx];
         if (it && !it.isStudio) {
-            await convertItemToStudio(idx, { silent: true, auto: true });
+            await convertItemToStudio(idx, { silent: false, auto: true });
         }
     }
     isAutoConverting = false;
-    // Setelah semua selesai, refresh playlist
-    renderPlaylist();
 }
 
 // ============================================================
@@ -1147,49 +1148,27 @@ async function loadItem(index) {
     currentFile = it.file;
     isStudioConverted = it.isStudio || false;
 
-    // Kalau belum di-render, tampilkan status "Rendering"
-    if (!it.isStudio) {
-        audioPlayer.pause();
-        audioPlayer.removeAttribute('src');
-        audioPlayer.load();
-        if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-        const info = await getAudioInfo(it.file);
-        it.duration = info.duration || 0;
-        it.sampleRate = info.sampleRate || 44100;
-        updateUI(it, { pending: true });
-        renderPlaylist();
-        setStatus('⏳ Merender lossless... ' + it.name, 'info');
-        playBtn.disabled = true;
-        return;
-    }
-
-    // Sudah studio, langsung mainkan
-    if (it.url) {
-        if (currentUrl) URL.revokeObjectURL(currentUrl);
+    if (it.isStudio && it.url) {
+        // Rendered lossless result sudah siap — pakai ini.
+        if (currentUrl && currentUrl !== it.url) URL.revokeObjectURL(currentUrl);
         currentUrl = it.url;
         audioPlayer.src = currentUrl;
         audioPlayer.load();
         updateUI(it);
         renderPlaylist();
-        playBtn.disabled = false;
-        setStatus('Siap diputar: ' + it.name, 'ok');
+        return;
     }
-}
 
-    // Not rendered yet — show metadata only. The raw/original file is never
-    // loaded into the player; playback stays disabled until the lossless
-    // FFmpeg render finishes.
-    audioPlayer.pause();
-    audioPlayer.removeAttribute('src');
+    // Belum selesai di-render — tetap bisa diputar pakai file asli (rawUrl),
+    // sementara render lossless jalan di background lewat auto-convert queue.
+    if (!it.rawUrl) it.rawUrl = URL.createObjectURL(it.file);
+    if (currentUrl && currentUrl !== it.rawUrl) URL.revokeObjectURL(currentUrl);
+    currentUrl = it.rawUrl;
+    audioPlayer.src = currentUrl;
     audioPlayer.load();
-    if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-
-    const info = await getAudioInfo(it.file);
-    it.duration = info.duration || 0;
-    it.sampleRate = info.sampleRate || 44100;
     updateUI(it, { pending: true });
     renderPlaylist();
-    setStatus('Menunggu render lossless: ' + it.name, 'info');
+    setStatus('Memutar versi asli, merender lossless: ' + it.name, 'info');
 }
 
 function updateUI(it, opts) {
@@ -1206,10 +1185,10 @@ function updateUI(it, opts) {
     bindAudioEvents();
 
     if (opts.pending) {
-        songArtist.textContent = 'Merender lossless...';
+        songArtist.textContent = (it.sampleRate || 44100) + 'Hz · ' + formatSize(it.size) + ' · Original (merender lossless...)';
         statusBadge.textContent = '🔄 Rendering';
         statusBadge.className = 'badge';
-        playBtn.disabled = true;
+        playBtn.disabled = false;
     } else {
         songArtist.textContent = (it.sampleRate || 44100) + 'Hz · ' + formatSize(it.size) + (it.isStudio ? ' · Studio' : '');
         statusBadge.textContent = '● Siap';
@@ -1222,34 +1201,28 @@ function updateUI(it, opts) {
 // PLAY FROM PLAYLIST
 // ============================================================
 function playFromPlaylist(index) {
-    if (index === currentIndex && isPlaying) { 
-        togglePlay(); 
-        return; 
-    }
+    if (index === currentIndex && isPlaying) { togglePlay(); return; }
+    if (index === currentIndex && audioPlayer.src) { audioPlayer.play().catch(() => {}); return; }
+    loadAndPlay(index);
+}
+
+function loadAndPlay(index) {
     const it = items[index];
-    if (!it) return;
-    
-    // Kalau belum di-render, tunggu dulu
-    if (!it.isStudio) {
-        loadItem(index);
-        toast('⏳ Merender lossless... tunggu sebentar', 'info');
-        // Cek status render setiap 2 detik
-        const checkInterval = setInterval(() => {
-            if (items[index] && items[index].isStudio) {
-                clearInterval(checkInterval);
-                loadItem(index);
-                setTimeout(() => audioPlayer.play().catch(() => {}), 300);
-                toast('✅ Siap diputar!', 'ok');
-            }
-        }, 2000);
-        // Timeout setelah 30 detik
-        setTimeout(() => clearInterval(checkInterval), 30000);
-        return;
-    }
-    
-    // Sudah siap, langsung putar
+    if (it && !it.isStudio) toast('Memutar versi asli, versi lossless masih dirender...', 'info');
     loadItem(index);
     setTimeout(() => audioPlayer.play().catch(() => {}), 200);
+}
+
+function playPrev() {
+    if (items.length < 2) return;
+    const idx = (currentIndex - 1 + items.length) % items.length;
+    loadAndPlay(idx);
+}
+
+function playNext() {
+    if (items.length < 2) return;
+    const idx = (currentIndex + 1) % items.length;
+    loadAndPlay(idx);
 }
 
 // ============================================================
@@ -1285,6 +1258,10 @@ function bindAudioEvents() {
     };
     audioPlayer.onended = () => {
         if (isLooping) { audioPlayer.currentTime = 0; audioPlayer.play(); return; }
+        if (items.length > 1 && currentIndex < items.length - 1) {
+            playNext();
+            return;
+        }
         playIcon.innerHTML = icon('play');
         statusBadge.textContent = '● Selesai';
         statusBadge.className = 'badge';
@@ -1311,6 +1288,8 @@ function togglePlay() {
     audioPlayer.paused ? audioPlayer.play().catch(() => {}) : audioPlayer.pause();
 }
 playBtn.addEventListener('click', togglePlay);
+prevBtn.addEventListener('click', playPrev);
+nextBtn.addEventListener('click', playNext);
 
 // ============================================================
 // LOOP
@@ -1438,7 +1417,7 @@ async function convertItemToStudio(index, opts) {
         if (isCurrent) {
             const wasPlaying = !audioPlayer.paused;
             const resumeAt = audioPlayer.currentTime || 0;
-            if (currentUrl) URL.revokeObjectURL(currentUrl);
+            if (currentUrl && currentUrl !== it.url) URL.revokeObjectURL(currentUrl);
             currentUrl = it.url;
             currentBlob = blob;
             isStudioConverted = true;
@@ -1459,6 +1438,7 @@ async function convertItemToStudio(index, opts) {
         } else if (oldItemUrl) {
             URL.revokeObjectURL(oldItemUrl);
         }
+        if (it.rawUrl) { URL.revokeObjectURL(it.rawUrl); it.rawUrl = null; }
 
         toast('✅ ' + it.name + ' — lossless ' + (outSr / 1000) + 'kHz/32-bit siap', 'ok');
         setStatus('Studio grade siap: ' + it.name, 'ok');
@@ -1494,7 +1474,10 @@ function downloadAudio() {
 // ============================================================
 function resetPlayer() {
     if (!confirm('Reset pemutar?')) return;
-    items.forEach(it => { if (it.url) URL.revokeObjectURL(it.url); });
+    items.forEach(it => {
+        if (it.url) URL.revokeObjectURL(it.url);
+        if (it.rawUrl) URL.revokeObjectURL(it.rawUrl);
+    });
     items = [];
     autoConvertQueue = [];
     currentIndex = -1;
