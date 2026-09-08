@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora Player — High Quality Music</title>
+    <title>Aurora Sound — Professional Audio System</title>
     
     <!-- FFmpeg WASM -->
     <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
     <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/all.min.css">
     
     <style>
         /* ===== ROOT ===== */
@@ -19,6 +19,7 @@
             --primary: #7c5cff;
             --secondary: #21d4fd;
             --accent: #ff7eb6;
+            --gold: #fbbf24;
             --bg: #0a0a12;
             --glass: rgba(255,255,255,.04);
             --border: rgba(255,255,255,.06);
@@ -35,16 +36,16 @@
             position: relative;
             overflow-x: hidden;
         }
-        /* ===== BACKGROUND ANIMASI ===== */
+        /* ===== BACKGROUND ===== */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
             z-index: 0;
             background: 
-                radial-gradient(ellipse 800px 600px at 15% 20%, rgba(124,92,255,.12), transparent 60%),
-                radial-gradient(ellipse 600px 600px at 85% 80%, rgba(33,212,253,.10), transparent 55%),
-                radial-gradient(ellipse 500px 400px at 50% 50%, rgba(124,92,255,.06), transparent 50%);
+                radial-gradient(ellipse 800px 600px at 15% 20%, rgba(124,92,255,.10), transparent 60%),
+                radial-gradient(ellipse 600px 600px at 85% 80%, rgba(33,212,253,.08), transparent 55%),
+                radial-gradient(ellipse 500px 400px at 50% 50%, rgba(124,92,255,.05), transparent 50%);
             animation: floatBg 18s ease-in-out infinite alternate;
         }
         @keyframes floatBg {
@@ -52,7 +53,7 @@
             50% { transform: translate(20px, -20px) scale(1.05); }
             100% { transform: translate(-10px, 10px) scale(0.95); }
         }
-        
+
         /* ===== PARTIKEL ===== */
         .particles {
             position: fixed;
@@ -63,9 +64,9 @@
         }
         .particle {
             position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(124,92,255,.3);
+            width: 3px;
+            height: 3px;
+            background: rgba(124,92,255,.2);
             border-radius: 50%;
             animation: particleFloat linear infinite;
         }
@@ -81,13 +82,13 @@
             position: relative;
             z-index: 1;
             width: 100%;
-            max-width: 560px;
-            background: rgba(19,24,56,.6);
+            max-width: 720px;
+            background: rgba(19,24,56,.55);
             backdrop-filter: blur(32px) saturate(180%);
             -webkit-backdrop-filter: blur(32px) saturate(180%);
             border: 1px solid rgba(255,255,255,.07);
             border-radius: 28px;
-            padding: 28px 24px 24px;
+            padding: 28px 28px 24px;
             box-shadow: 
                 0 30px 80px -20px rgba(0,0,0,.8),
                 0 0 0 1px rgba(124,92,255,.06) inset,
@@ -96,7 +97,7 @@
         }
         .player-container:hover {
             border-color: rgba(124,92,255,.15);
-            box-shadow: 0 30px 80px -20px rgba(124,92,255,.15), 0 0 0 1px rgba(124,92,255,.08) inset;
+            box-shadow: 0 30px 80px -20px rgba(124,92,255,.12), 0 0 0 1px rgba(124,92,255,.08) inset;
         }
 
         /* ===== HEADER ===== */
@@ -104,7 +105,9 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .player-brand {
             display: flex;
@@ -112,14 +115,14 @@
             gap: 10px;
         }
         .player-brand .logo {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 12px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 20px;
             color: #fff;
             box-shadow: 0 4px 16px rgba(124,92,255,.3);
             animation: logoPulse 3s ease-in-out infinite;
@@ -129,7 +132,7 @@
             50% { box-shadow: 0 4px 30px rgba(124,92,255,.5); }
         }
         .player-brand h1 {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
             letter-spacing: -0.5px;
         }
@@ -150,29 +153,32 @@
         .player-quality {
             font-size: 9px;
             font-weight: 700;
-            color: #4ade80;
-            background: rgba(52,211,153,.1);
             padding: 4px 12px;
             border-radius: 20px;
             border: 1px solid rgba(52,211,153,.15);
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
+            background: rgba(52,211,153,.06);
+            color: #4ade80;
         }
-        .player-quality i {
-            font-size: 7px;
+        .player-quality i { font-size: 8px; }
+        .player-quality.studio {
+            background: rgba(251,146,60,.06);
+            color: #fbbf24;
+            border-color: rgba(251,146,60,.15);
         }
 
         /* ===== UPLOAD ZONE ===== */
         .upload-zone {
             border: 2px dashed rgba(255,255,255,.1);
             border-radius: 16px;
-            padding: 28px 16px;
+            padding: 24px 16px;
             text-align: center;
             cursor: pointer;
             transition: all .3s ease;
             background: rgba(255,255,255,.02);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             position: relative;
             overflow: hidden;
         }
@@ -186,9 +192,9 @@
             transform: scale(1.01);
         }
         .upload-zone .icon {
-            font-size: 32px;
+            font-size: 30px;
             opacity: .3;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             transition: all .3s;
         }
         .upload-zone:hover .icon {
@@ -196,29 +202,27 @@
             transform: translateY(-2px);
         }
         .upload-zone .title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: #a1a1aa;
         }
-        .upload-zone .title b {
-            color: #e4e4e7;
-        }
+        .upload-zone .title b { color: #e4e4e7; }
         .upload-zone .sub {
-            font-size: 10px;
+            font-size: 9px;
             color: #52525b;
             margin-top: 2px;
         }
         .upload-zone .formats {
             display: flex;
             justify-content: center;
-            gap: 6px;
-            margin-top: 8px;
+            gap: 4px;
+            margin-top: 6px;
             flex-wrap: wrap;
         }
         .upload-zone .formats span {
-            font-size: 8px;
+            font-size: 7px;
             font-weight: 600;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
             background: rgba(255,255,255,.04);
             border: 1px solid rgba(255,255,255,.04);
@@ -233,14 +237,13 @@
             background: rgba(255,255,255,.03);
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,.04);
-            margin-bottom: 14px;
-            font-size: 11px;
+            margin-bottom: 12px;
+            font-size: 10px;
             color: #a1a1aa;
             animation: slideDown .3s ease;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 12px;
         }
         .file-info .row {
             display: flex;
@@ -253,14 +256,14 @@
         /* ===== COVER ===== */
         .cover-art {
             width: 100%;
-            aspect-ratio: 1/1;
-            max-height: 300px;
+            aspect-ratio: 16/9;
+            max-height: 320px;
             border-radius: 16px;
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 10px 40px -10px rgba(0,0,0,.6);
@@ -268,8 +271,8 @@
             transition: all .3s;
         }
         .cover-art .placeholder {
-            font-size: 64px;
-            opacity: .15;
+            font-size: 56px;
+            opacity: .12;
             transition: all .5s;
         }
         .cover-art .placeholder i {
@@ -277,19 +280,19 @@
         }
         @keyframes iconPulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+            50% { transform: scale(1.06); }
         }
         .cover-art .spectrum {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 60px;
+            height: 80px;
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            gap: 3px;
-            padding: 0 10px;
+            gap: 2px;
+            padding: 0 12px;
             opacity: 0;
             transition: opacity .5s ease;
         }
@@ -297,31 +300,28 @@
             opacity: 1;
         }
         .cover-art .spectrum .bar {
-            width: 4px;
-            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            width: 3px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary), var(--accent));
             border-radius: 2px;
-            transition: height .1s ease;
+            transition: height .08s ease;
             min-height: 2px;
-            box-shadow: 0 0 10px rgba(124,92,255,.2);
+            box-shadow: 0 0 8px rgba(124,92,255,.15);
         }
 
-        /* ===== SONG TITLE ===== */
+        /* ===== SONG INFO ===== */
         .song-info {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .song-info .title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             color: #e4e4e7;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .song-info .title i {
-            font-size: 12px;
-            opacity: .3;
-        }
+        .song-info .title i { font-size: 13px; opacity: .2; }
         .song-info .artist {
             font-size: 12px;
             color: #71717a;
@@ -331,12 +331,13 @@
             display: inline-block;
             font-size: 8px;
             font-weight: 700;
-            padding: 2px 10px;
+            padding: 2px 12px;
             border-radius: 10px;
             margin-top: 4px;
             background: rgba(124,92,255,.1);
             color: #a78bfa;
             border: 1px solid rgba(124,92,255,.1);
+            transition: all .3s;
         }
         .song-info .status-badge.playing {
             background: rgba(52,211,153,.1);
@@ -344,9 +345,15 @@
             border-color: rgba(52,211,153,.15);
             animation: statusPulse 1.5s ease-in-out infinite;
         }
+        .song-info .status-badge.converting {
+            background: rgba(251,146,60,.1);
+            color: #fbbf24;
+            border-color: rgba(251,146,60,.15);
+            animation: statusPulse .8s ease-in-out infinite;
+        }
         @keyframes statusPulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
+            50% { opacity: .4; }
         }
 
         /* ===== CONTROLS ===== */
@@ -354,17 +361,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin: 12px 0 10px;
+            gap: 14px;
+            margin: 10px 0 8px;
         }
         .controls .ctrl-btn {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             border: none;
             background: rgba(255,255,255,.04);
             color: #a1a1aa;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all .2s ease;
             display: flex;
@@ -377,9 +384,7 @@
             color: #e4e4e7;
             transform: translateY(-2px);
         }
-        .controls .ctrl-btn:active {
-            transform: scale(.94);
-        }
+        .controls .ctrl-btn:active { transform: scale(.94); }
         .controls .ctrl-btn.play-btn {
             width: 52px;
             height: 52px;
@@ -393,11 +398,9 @@
             transform: translateY(-2px) scale(1.03);
             box-shadow: 0 6px 30px rgba(124,92,255,.4);
         }
-        .controls .ctrl-btn.play-btn:active {
-            transform: scale(.94);
-        }
+        .controls .ctrl-btn.play-btn:active { transform: scale(.94); }
         .controls .ctrl-btn:disabled {
-            opacity: .3;
+            opacity: .25;
             cursor: not-allowed;
             transform: none !important;
         }
@@ -414,6 +417,7 @@
             font-variant-numeric: tabular-nums;
             color: #71717a;
             min-width: 34px;
+            font-weight: 500;
         }
         .progress-wrap .time:first-child { text-align: right; }
         .progress-wrap .time:last-child { text-align: left; }
@@ -426,13 +430,11 @@
             cursor: pointer;
             transition: height .2s;
         }
-        .progress-bar:hover {
-            height: 6px;
-        }
+        .progress-bar:hover { height: 6px; }
         .progress-bar .fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
             border-radius: 2px;
             transition: width .05s linear;
             position: relative;
@@ -450,11 +452,9 @@
             transition: opacity .2s;
             box-shadow: 0 0 12px rgba(124,92,255,.4);
         }
-        .progress-bar:hover .fill::after {
-            opacity: 1;
-        }
+        .progress-bar:hover .fill::after { opacity: 1; }
 
-        /* ===== VOLUME & QUALITY ===== */
+        /* ===== BOTTOM BAR ===== */
         .bottom-bar {
             display: flex;
             align-items: center;
@@ -462,17 +462,17 @@
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px solid rgba(255,255,255,.04);
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .volume-wrap {
             display: flex;
             align-items: center;
             gap: 8px;
             flex: 1;
+            min-width: 120px;
         }
-        .volume-wrap i {
-            font-size: 12px;
-            color: #71717a;
-        }
+        .volume-wrap i { font-size: 11px; color: #71717a; }
         .volume-wrap input[type="range"] {
             flex: 1;
             max-width: 80px;
@@ -501,7 +501,8 @@
         }
         .bottom-actions {
             display: flex;
-            gap: 6px;
+            gap: 5px;
+            flex-wrap: wrap;
         }
         .bottom-actions .btn {
             padding: 4px 10px;
@@ -531,6 +532,15 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 16px rgba(124,92,255,.3);
         }
+        .bottom-actions .btn.gold {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: #000;
+            border: none;
+        }
+        .bottom-actions .btn.gold:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(251,191,36,.3);
+        }
         .bottom-actions .btn.danger {
             background: rgba(248,113,113,.08);
             color: #f87171;
@@ -538,6 +548,14 @@
         }
         .bottom-actions .btn.danger:hover {
             background: rgba(248,113,113,.15);
+        }
+        .bottom-actions .btn.success {
+            background: rgba(52,211,153,.08);
+            color: #4ade80;
+            border-color: rgba(52,211,153,.15);
+        }
+        .bottom-actions .btn.success:hover {
+            background: rgba(52,211,153,.15);
         }
 
         /* ===== STATUS ===== */
@@ -548,31 +566,31 @@
             margin-top: 10px;
             min-height: 14px;
         }
-        .status-text i {
-            margin-right: 4px;
-        }
+        .status-text i { margin-right: 4px; }
         .status-text .ok { color: #4ade80; }
         .status-text .err { color: #f87171; }
         .status-text .info { color: #60a5fa; }
+        .status-text .warn { color: #fbbf24; }
 
         /* ===== TOAST ===== */
         .toast-wrap {
             position: fixed;
-            top: 20px;
+            top: 16px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 99999;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
             pointer-events: none;
+            max-width: 90vw;
         }
         .toast-item {
             padding: 8px 18px;
             border-radius: 10px;
             font-size: 11px;
             font-weight: 600;
-            background: rgba(10,10,12,.9);
+            background: rgba(10,10,12,.92);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255,255,255,.06);
             color: #e4e4e7;
@@ -587,6 +605,7 @@
         .toast-item.ok .icon { color: #4ade80; }
         .toast-item.err .icon { color: #f87171; }
         .toast-item.info .icon { color: #60a5fa; }
+        .toast-item.warn .icon { color: #fbbf24; }
         @keyframes toastIn {
             from { opacity: 0; transform: translateY(-12px); }
             to { opacity: 1; transform: translateY(0); }
@@ -596,17 +615,61 @@
             to { opacity: 0; transform: translateY(-8px); }
         }
 
+        /* ===== EQ PRESETS ===== */
+        .eq-presets {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            justify-content: center;
+        }
+        .eq-presets .eq-btn {
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,.06);
+            background: rgba(255,255,255,.02);
+            color: #71717a;
+            font-size: 7px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .eq-presets .eq-btn:hover {
+            background: rgba(124,92,255,.1);
+            border-color: rgba(124,92,255,.2);
+            color: #a78bfa;
+        }
+        .eq-presets .eq-btn.active {
+            background: rgba(124,92,255,.15);
+            border-color: rgba(124,92,255,.3);
+            color: #a78bfa;
+        }
+
         /* ===== RESPONSIVE ===== */
-        @media(max-width:480px) {
+        @media(max-width:600px) {
             .player-container { padding: 16px; border-radius: 20px; }
-            .player-brand h1 { font-size: 15px; }
+            .player-brand h1 { font-size: 16px; }
             .player-quality { font-size: 8px; padding: 2px 8px; }
-            .controls .ctrl-btn { width: 34px; height: 34px; font-size: 12px; }
+            .controls .ctrl-btn { width: 32px; height: 32px; font-size: 11px; }
             .controls .ctrl-btn.play-btn { width: 44px; height: 44px; font-size: 16px; }
-            .song-info .title { font-size: 15px; }
-            .cover-art .placeholder { font-size: 40px; }
+            .song-info .title { font-size: 16px; }
+            .cover-art .placeholder { font-size: 36px; }
             .bottom-actions .btn { font-size: 8px; padding: 3px 8px; }
             .volume-wrap input[type="range"] { max-width: 60px; }
+            .file-info { grid-template-columns: 1fr; font-size: 9px; }
+            .cover-art .spectrum { height: 50px; }
+            .cover-art .spectrum .bar { width: 2px; }
+        }
+        @media(max-width:400px) {
+            .player-container { padding: 12px; border-radius: 16px; }
+            .player-brand .logo { width: 36px; height: 36px; font-size: 16px; }
+            .player-brand h1 { font-size: 14px; }
+            .controls .ctrl-btn.play-btn { width: 38px; height: 38px; font-size: 14px; }
+            .controls .ctrl-btn { width: 28px; height: 28px; font-size: 10px; }
+            .bottom-bar { flex-direction: column; align-items: stretch; }
+            .volume-wrap { max-width: 100%; }
+            .volume-wrap input[type="range"] { max-width: 100%; }
+            .bottom-actions { justify-content: center; }
         }
     </style>
 </head>
@@ -626,16 +689,16 @@
         <div class="player-brand">
             <div class="logo"><i class="fas fa-crown"></i></div>
             <div>
-                <h1>Aurora<span>Player</span></h1>
+                <h1>Aurora<span>Sound</span></h1>
                 <div style="display:flex;gap:4px;align-items:center;margin-top:-2px;">
-                    <span class="version">v2.0</span>
+                    <span class="version">Studio v3.0</span>
                     <span style="font-size:7px;color:#52525b;">·</span>
-                    <span style="font-size:7px;color:#52525b;">HQ Audio</span>
+                    <span style="font-size:7px;color:#52525b;">Professional Audio</span>
                 </div>
             </div>
         </div>
-        <div class="player-quality">
-            <i class="fas fa-check-circle"></i> 48kHz
+        <div class="player-quality studio">
+            <i class="fas fa-star"></i> Studio Grade
         </div>
     </div>
 
@@ -643,36 +706,34 @@
     <div class="upload-zone" id="uploadZone">
         <div class="icon"><i class="fas fa-cloud-arrow-up"></i></div>
         <div class="title"><b>Klik atau tarik</b> file audio</div>
-        <div class="sub">MP3, WAV, FLAC, OGG, M4A, AAC, OPUS</div>
+        <div class="sub">MP3, WAV, FLAC, OGG, M4A, AAC, OPUS, AIFF</div>
         <div class="formats">
-            <span>MP3</span>
-            <span>WAV</span>
-            <span>FLAC</span>
-            <span>OGG</span>
-            <span>M4A</span>
-            <span>AAC</span>
+            <span>MP3</span><span>WAV</span><span>FLAC</span><span>OGG</span>
+            <span>M4A</span><span>AAC</span><span>AIFF</span><span>OPUS</span>
         </div>
     </div>
-    <input type="file" id="fileInput" accept=".mp3,.wav,.flac,.ogg,.m4a,.aac,.opus">
+    <input type="file" id="fileInput" accept=".mp3,.wav,.flac,.ogg,.m4a,.aac,.aiff,.opus">
 
     <!-- FILE INFO -->
-    <div class="file-info" id="fileInfo">
+    <div class="file-info" id="fileInfo" style="display:grid;">
         <div class="row"><span class="label">📁 File</span><span class="value" id="fileName">-</span></div>
         <div class="row"><span class="label">📦 Ukuran</span><span class="value" id="fileSize">-</span></div>
         <div class="row"><span class="label">⏱️ Durasi</span><span class="value" id="fileDuration">-</span></div>
         <div class="row"><span class="label">🎵 Sample Rate</span><span class="value" id="fileSampleRate">-</span></div>
+        <div class="row"><span class="label">📊 Bit Depth</span><span class="value" id="fileBitDepth">-</span></div>
+        <div class="row"><span class="label">🔊 Bitrate</span><span class="value" id="fileBitrate">-</span></div>
     </div>
 
     <!-- COVER ART -->
     <div class="cover-art" id="coverArt">
-        <div class="placeholder"><i class="fas fa-music"></i></div>
+        <div class="placeholder"><i class="fas fa-compact-disc"></i></div>
         <div class="spectrum" id="spectrum"></div>
     </div>
 
     <!-- SONG INFO -->
     <div class="song-info">
-        <div class="title" id="songTitle"><i class="fas fa-music" style="opacity:.2"></i> Belum ada lagu</div>
-        <div class="artist" id="songArtist">Upload file audio untuk mulai</div>
+        <div class="title" id="songTitle"><i class="fas fa-music" style="opacity:.2;"></i> Belum ada lagu</div>
+        <div class="artist" id="songArtist">Upload audio untuk mulai</div>
         <div class="status-badge" id="statusBadge">● Siap</div>
     </div>
 
@@ -681,6 +742,7 @@
         <button class="ctrl-btn" id="prevBtn" disabled><i class="fas fa-backward-step"></i></button>
         <button class="ctrl-btn play-btn" id="playBtn" disabled><i class="fas fa-play" id="playIcon"></i></button>
         <button class="ctrl-btn" id="nextBtn" disabled><i class="fas fa-forward-step"></i></button>
+        <button class="ctrl-btn" id="loopBtn" onclick="toggleLoop()" title="Loop"><i class="fas fa-arrow-rotate-right"></i></button>
     </div>
 
     <!-- PROGRESS -->
@@ -692,6 +754,18 @@
         <span class="time" id="totalTime">0:00</span>
     </div>
 
+    <!-- EQ PRESETS -->
+    <div class="eq-presets" id="eqPresets">
+        <span style="font-size:7px;color:#52525b;display:flex;align-items:center;margin-right:2px;">EQ:</span>
+        <button class="eq-btn active" data-eq="flat" onclick="setEQ('flat')">Flat</button>
+        <button class="eq-btn" data-eq="rock" onclick="setEQ('rock')">Rock</button>
+        <button class="eq-btn" data-eq="pop" onclick="setEQ('pop')">Pop</button>
+        <button class="eq-btn" data-eq="jazz" onclick="setEQ('jazz')">Jazz</button>
+        <button class="eq-btn" data-eq="classical" onclick="setEQ('classical')">Classical</button>
+        <button class="eq-btn" data-eq="bass" onclick="setEQ('bass')">Bass Boost</button>
+        <button class="eq-btn" data-eq="vocal" onclick="setEQ('vocal')">Vocal</button>
+    </div>
+
     <!-- BOTTOM BAR -->
     <div class="bottom-bar">
         <div class="volume-wrap">
@@ -700,15 +774,15 @@
             <i class="fas fa-volume-high"></i>
         </div>
         <div class="bottom-actions">
-            <button class="btn primary" id="convertBtn" onclick="convertToHQ()"><i class="fas fa-magic"></i> HQ</button>
-            <button class="btn" onclick="downloadAudio()"><i class="fas fa-download"></i></button>
+            <button class="btn gold" id="studioBtn" onclick="convertToStudio()"><i class="fas fa-wand-magic-sparkles"></i> Studio</button>
+            <button class="btn primary" onclick="downloadAudio()"><i class="fas fa-download"></i></button>
             <button class="btn danger" onclick="resetPlayer()"><i class="fas fa-trash"></i></button>
         </div>
     </div>
 
     <!-- STATUS -->
     <div class="status-text" id="statusText">
-        <i class="fas fa-circle info"></i> Siap memutar musik kualitas tinggi
+        <i class="fas fa-circle info"></i> Siap memutar audio studio grade
     </div>
 </div>
 
@@ -732,6 +806,8 @@ const fileName = $('fileName');
 const fileSize = $('fileSize');
 const fileDuration = $('fileDuration');
 const fileSampleRate = $('fileSampleRate');
+const fileBitDepth = $('fileBitDepth');
+const fileBitrate = $('fileBitrate');
 const coverArt = $('coverArt');
 const spectrum = $('spectrum');
 const songTitle = $('songTitle');
@@ -741,6 +817,7 @@ const playBtn = $('playBtn');
 const playIcon = $('playIcon');
 const prevBtn = $('prevBtn');
 const nextBtn = $('nextBtn');
+const loopBtn = $('loopBtn');
 const progressBar = $('progressBar');
 const progressFill = $('progressFill');
 const currentTime = $('currentTime');
@@ -756,11 +833,31 @@ let currentFile = null;
 let currentBlob = null;
 let currentUrl = null;
 let isPlaying = false;
+let isLooping = false;
 let isReady = false;
 let ffmpeg = null;
 let audioFiles = [];
 let currentIndex = -1;
-let convertQuality = 'hq'; // hq, lossless
+let currentEQ = 'flat';
+let audioContext = null;
+let analyser = null;
+let dataArray = null;
+let animationId = null;
+let spectrumBars = [];
+let isStudioConverted = false;
+
+// ============================================================
+// EQ PRESETS (gain in dB)
+// ============================================================
+const EQ_PRESETS = {
+    flat: { low: 0, mid: 0, high: 0 },
+    rock: { low: 4, mid: -2, high: 3 },
+    pop: { low: -1, mid: 2, high: 2 },
+    jazz: { low: 3, mid: 1, high: -1 },
+    classical: { low: 2, mid: 0, high: 3 },
+    bass: { low: 6, mid: -2, high: -1 },
+    vocal: { low: -2, mid: 4, high: 1 }
+};
 
 // ============================================================
 // TOAST
@@ -769,7 +866,7 @@ function toast(msg, type = 'info') {
     const wrap = $('toastWrap');
     const el = document.createElement('div');
     el.className = 'toast-item ' + type;
-    const icons = { ok: 'fa-check-circle', err: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    const icons = { ok: 'fa-check-circle', err: 'fa-exclamation-circle', info: 'fa-info-circle', warn: 'fa-triangle-exclamation' };
     el.innerHTML = `<span class="icon"><i class="fas ${icons[type] || icons.info}"></i></span><span>${msg}</span>`;
     wrap.appendChild(el);
     setTimeout(() => { if (el.parentNode) el.remove(); }, 3000);
@@ -780,14 +877,14 @@ function toast(msg, type = 'info') {
 // ============================================================
 function createParticles() {
     const container = $('particles');
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 25; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
         p.style.left = Math.random() * 100 + '%';
-        p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
-        p.style.animationDuration = (15 + Math.random() * 25) + 's';
-        p.style.animationDelay = (Math.random() * 20) + 's';
-        p.style.opacity = 0.1 + Math.random() * 0.3;
+        p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+        p.style.animationDuration = (15 + Math.random() * 20) + 's';
+        p.style.animationDelay = (Math.random() * 15) + 's';
+        p.style.opacity = 0.1 + Math.random() * 0.2;
         container.appendChild(p);
     }
 }
@@ -796,15 +893,10 @@ createParticles();
 // ============================================================
 // SPECTRUM VISUALIZER
 // ============================================================
-let spectrumBars = [];
-let audioContext = null;
-let analyser = null;
-let dataArray = null;
-let animationId = null;
-
 function initSpectrum() {
-    const bars = 32;
+    const bars = 40;
     spectrum.innerHTML = '';
+    spectrumBars = [];
     for (let i = 0; i < bars; i++) {
         const bar = document.createElement('div');
         bar.className = 'bar';
@@ -819,9 +911,13 @@ function startSpectrum() {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 256;
-        const source = audioContext.createMediaElementSource(audioPlayer);
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
+        try {
+            const source = audioContext.createMediaElementSource(audioPlayer);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+        } catch(e) {
+            // sudah terkoneksi
+        }
         dataArray = new Uint8Array(analyser.frequencyBinCount);
     }
     spectrum.classList.add('active');
@@ -834,7 +930,7 @@ function animateSpectrum() {
     const step = Math.floor(dataArray.length / spectrumBars.length);
     for (let i = 0; i < spectrumBars.length; i++) {
         const val = dataArray[i * step] || 0;
-        const height = Math.max(2, (val / 255) * 50);
+        const height = Math.max(2, (val / 255) * 60);
         spectrumBars[i].style.height = height + 'px';
     }
     animationId = requestAnimationFrame(animateSpectrum);
@@ -862,8 +958,8 @@ async function bootFFmpeg() {
             classWorkerURL: await toBlobURL('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js', 'text/javascript')
         });
         isReady = true;
-        toast('✅ FFmpeg siap!', 'ok');
-        setStatus('✅ Siap memproses audio kualitas tinggi', 'ok');
+        toast('✅ FFmpeg studio engine siap', 'ok');
+        setStatus('✅ Siap memproses audio studio grade', 'ok');
     } catch (e) {
         setStatus('❌ Gagal load FFmpeg: ' + e.message, 'err');
         toast('❌ Gagal load FFmpeg', 'err');
@@ -875,8 +971,8 @@ async function bootFFmpeg() {
 // SET STATUS
 // ============================================================
 function setStatus(msg, type = 'info') {
-    const icons = { ok: 'fa-check-circle', err: 'fa-exclamation-circle', info: 'fa-circle' };
-    const colors = { ok: 'ok', err: 'err', info: 'info' };
+    const icons = { ok: 'fa-check-circle', err: 'fa-exclamation-circle', info: 'fa-circle', warn: 'fa-triangle-exclamation' };
+    const colors = { ok: 'ok', err: 'err', info: 'info', warn: 'warn' };
     statusText.innerHTML = `<i class="fas ${icons[type] || icons.info} ${colors[type] || 'info'}"></i> ${msg}`;
 }
 
@@ -912,9 +1008,6 @@ async function getAudioInfo(file) {
     }
 }
 
-// ============================================================
-// FORMAT SIZE
-// ============================================================
 function formatSize(bytes) {
     if (bytes < 1024) return bytes + 'B';
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + 'KB';
@@ -932,31 +1025,32 @@ function formatDuration(sec) {
 // HANDLE FILE UPLOAD
 // ============================================================
 async function handleFile(file) {
-    const allowed = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/flac', 'audio/mp4', 'audio/aac', 'audio/opus'];
-    if (!allowed.includes(file.type) && !file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac|opus)$/i)) {
+    const allowed = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/flac', 'audio/mp4', 'audio/aac', 'audio/opus', 'audio/aiff'];
+    if (!allowed.includes(file.type) && !file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac|opus|aiff|wma)$/i)) {
         toast('Format tidak didukung', 'err');
         return;
     }
 
     currentFile = file;
+    isStudioConverted = false;
     const info = await getAudioInfo(file);
 
     fileName.textContent = file.name;
     fileSize.textContent = formatSize(file.size);
     fileDuration.textContent = info.duration ? formatDuration(info.duration) : '-';
     fileSampleRate.textContent = info.sampleRate ? info.sampleRate + 'Hz' : '-';
-    fileInfo.style.display = 'block';
+    fileBitDepth.textContent = '16-bit';
+    fileBitrate.textContent = 'Varies';
+    fileInfo.style.display = 'grid';
 
     songTitle.textContent = file.name.replace(/\.[^.]+$/, '');
     songArtist.textContent = info.sampleRate + 'Hz · ' + formatSize(file.size);
 
-    // Load ke player
     if (currentUrl) URL.revokeObjectURL(currentUrl);
     currentUrl = URL.createObjectURL(file);
     audioPlayer.src = currentUrl;
     audioPlayer.load();
 
-    // Update UI
     audioFiles = [file];
     currentIndex = 0;
     playBtn.disabled = false;
@@ -965,15 +1059,13 @@ async function handleFile(file) {
     statusBadge.textContent = '● Siap putar';
     statusBadge.className = 'status-badge';
 
-    setStatus('🎵 ' + file.name + ' siap diputar', 'ok');
+    setStatus('🎵 ' + file.name + ' siap diputar studio', 'ok');
     toast('📁 ' + file.name + ' dimuat', 'ok');
 
-    // Cover art animasi
     const cover = coverArt.querySelector('.placeholder');
     cover.innerHTML = '<i class="fas fa-headphones" style="color:rgba(124,92,255,.3)"></i>';
     cover.style.fontSize = '48px';
 
-    // Bind audio events
     bindAudioEvents();
 }
 
@@ -984,7 +1076,7 @@ function bindAudioEvents() {
     audioPlayer.addEventListener('play', () => {
         isPlaying = true;
         playIcon.className = 'fas fa-pause';
-        statusBadge.textContent = '▶️ Sedang diputar';
+        statusBadge.textContent = '▶️ Diputar';
         statusBadge.className = 'status-badge playing';
         if (!spectrum.classList.contains('active')) {
             initSpectrum();
@@ -1017,19 +1109,22 @@ function bindAudioEvents() {
     });
 
     audioPlayer.addEventListener('ended', () => {
+        if (isLooping) {
+            audioPlayer.currentTime = 0;
+            audioPlayer.play();
+            return;
+        }
         playIcon.className = 'fas fa-play';
         statusBadge.textContent = '● Selesai';
         statusBadge.className = 'status-badge';
         stopSpectrum();
     });
 
-    // Volume
     volumeSlider.addEventListener('input', () => {
         audioPlayer.volume = volumeSlider.value / 100;
     });
     audioPlayer.volume = volumeSlider.value / 100;
 
-    // Progress click
     progressBar.addEventListener('click', (e) => {
         if (!audioPlayer.duration) return;
         const rect = progressBar.getBoundingClientRect();
@@ -1053,36 +1148,75 @@ function togglePlay() {
 playBtn.addEventListener('click', togglePlay);
 
 // ============================================================
-// CONVERT TO HIGH QUALITY (via FFmpeg)
+// LOOP
 // ============================================================
-async function convertToHQ() {
-    if (!currentFile) { toast('Upload file dulu', 'info'); return; }
+function toggleLoop() {
+    isLooping = !isLooping;
+    loopBtn.style.color = isLooping ? '#4ade80' : '#a1a1aa';
+    loopBtn.style.borderColor = isLooping ? 'rgba(52,211,153,.3)' : 'rgba(255,255,255,.06)';
+    toast(isLooping ? '🔁 Loop aktif' : 'Loop nonaktif', isLooping ? 'ok' : 'info');
+}
+
+// ============================================================
+// EQ
+// ============================================================
+function setEQ(preset) {
+    currentEQ = preset;
+    document.querySelectorAll('.eq-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.eq-btn[data-eq="${preset}"]`)?.classList.add('active');
+    toast('🎛️ EQ: ' + preset.charAt(0).toUpperCase() + preset.slice(1), 'info');
+    applyEQ(preset);
+}
+
+function applyEQ(preset) {
+    const eq = EQ_PRESETS[preset] || EQ_PRESETS.flat;
+    // EQ diterapkan saat convert ke studio
+    // Untuk playback realtime, kita simpan state dan terapkan di convert
+}
+
+// ============================================================
+// CONVERT TO STUDIO GRADE (Professional Sound System)
+// ============================================================
+async function convertToStudio() {
+    if (!currentFile) { toast('Upload audio dulu', 'info'); return; }
     if (!isReady) { toast('⏳ FFmpeg belum siap', 'info'); return; }
-    if (!ffmpeg) { toast('❌ FFmpeg tidak tersedia', 'err'); return; }
 
-    const btn = $('convertBtn');
+    const btn = $('studioBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Proses...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Studio...';
 
-    toast('🎛️ Mengonversi ke kualitas tinggi...', 'info');
-    setStatus('⏳ Mengonversi audio...', 'info');
+    toast('🎛️ Mengonversi ke Studio Grade...', 'info');
+    setStatus('⏳ Mengonversi audio studio grade...', 'info');
+    statusBadge.textContent = '🔄 Converting';
+    statusBadge.className = 'status-badge converting';
 
     try {
         const inputName = 'input_' + currentFile.name;
         const outputName = 'output_' + Date.now() + '.wav';
 
-        // Baca info
         const info = await getAudioInfo(currentFile);
         const sampleRate = info.sampleRate || 44100;
+        const eq = EQ_PRESETS[currentEQ] || EQ_PRESETS.flat;
 
-        // Filter: Normalisasi + Resample ke 48kHz + Limiter
-        const filter = `loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000,alimiter=limit=0.97:attack=5:release=50`;
+        // === PROFESSIONAL STUDIO FILTER CHAIN ===
+        // 1. EQ (bass/mid/treble)
+        // 2. Loudnorm (normalisasi ke -16 LUFS untuk dynamic range lebar)
+        // 3. Resample ke 48kHz (standar studio)
+        // 4. Limiter (soft clip)
+        const filter = [
+            `bass=g=${eq.low}:f=320`,
+            `equalizer=g=${eq.mid}:f=1000:width_type=q:w=1`,
+            `treble=g=${eq.high}:f=3200`,
+            `loudnorm=I=-16:TP=-1.5:LRA=14`,
+            `aresample=48000:filter_size=128:cutoff=0.995`,
+            `alimiter=limit=0.97:attack=3:release=50`
+        ].join(',');
 
         await ffmpeg.writeFile(inputName, await fetchFile(currentFile));
 
         ffmpeg.on('progress', ({ progress }) => {
             const pct = Math.min(100, Math.round(progress * 100));
-            setStatus(`⏳ Mengonversi... ${pct}%`, 'info');
+            setStatus(`⏳ Studio convert... ${pct}%`, 'info');
         });
 
         await ffmpeg.exec([
@@ -1090,7 +1224,7 @@ async function convertToHQ() {
             '-af', filter,
             '-map_metadata', '-1',
             '-fflags', '+bitexact',
-            '-c:a', 'pcm_s16le',
+            '-c:a', 'pcm_s24le',  // 24-bit depth untuk dynamic range maksimal
             '-ar', '48000',
             '-y', outputName
         ]);
@@ -1098,40 +1232,43 @@ async function convertToHQ() {
         const data = await ffmpeg.readFile(outputName);
         const blob = new Blob([data.buffer], { type: 'audio/wav' });
 
-        // Simpan hasil
         currentBlob = blob;
-        const url = URL.createObjectURL(blob);
+        isStudioConverted = true;
 
-        // Update player dengan hasil convert
         if (currentUrl) URL.revokeObjectURL(currentUrl);
-        currentUrl = url;
-        audioPlayer.src = url;
+        currentUrl = URL.createObjectURL(blob);
+        audioPlayer.src = currentUrl;
         audioPlayer.load();
 
-        // Update info
         const outInfo = await getAudioInfo(blob);
-        fileSampleRate.textContent = '48000Hz (HQ)';
+        fileSampleRate.textContent = '48000Hz (Studio)';
+        fileBitDepth.textContent = '24-bit';
         fileDuration.textContent = formatDuration(outInfo.duration);
+        fileSize.textContent = formatSize(blob.size);
 
-        songArtist.textContent = '48kHz · WAV · ' + formatSize(blob.size);
+        songArtist.textContent = '48kHz · 24-bit WAV · ' + formatSize(blob.size);
+        songTitle.textContent = currentFile.name.replace(/\.[^.]+$/, '') + ' [Studio]';
 
-        toast('✅ Konversi selesai! Kualitas 48kHz WAV', 'ok');
-        setStatus('✅ Konversi selesai! Kualitas tinggi', 'ok');
+        toast('✅ Studio Grade selesai! 24-bit 48kHz WAV', 'ok');
+        setStatus('✅ Studio Grade selesai! Dynamic range maksimal', 'ok');
+        statusBadge.textContent = '✅ Studio Ready';
+        statusBadge.className = 'status-badge';
 
-        // Play hasil
         audioPlayer.play().catch(() => {});
 
         await ffmpeg.deleteFile(inputName).catch(() => {});
         await ffmpeg.deleteFile(outputName).catch(() => {});
 
     } catch (e) {
-        toast('❌ Gagal konversi: ' + e.message, 'err');
+        toast('❌ Gagal convert studio: ' + e.message, 'err');
         setStatus('❌ Gagal: ' + e.message, 'err');
+        statusBadge.textContent = '❌ Error';
+        statusBadge.className = 'status-badge';
         console.error(e);
     }
 
     btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-magic"></i> HQ';
+    btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Studio';
 }
 
 // ============================================================
@@ -1144,11 +1281,12 @@ function downloadAudio() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     const name = currentFile ? currentFile.name.replace(/\.[^.]+$/, '') : 'audio';
-    a.download = name + (currentBlob ? '_HQ.wav' : '.mp3');
+    const suffix = isStudioConverted ? '_Studio_24bit_48kHz' : '';
+    a.download = name + suffix + '.wav';
     document.body.appendChild(a);
     a.click();
     a.remove();
-    toast('⬇ Download dimulai', 'ok');
+    toast('⬇ Download studio grade dimulai', 'ok');
 }
 
 // ============================================================
@@ -1160,13 +1298,14 @@ function resetPlayer() {
     currentFile = null;
     currentBlob = null;
     currentUrl = null;
+    isStudioConverted = false;
     audioFiles = [];
     currentIndex = -1;
     audioPlayer.src = '';
     audioPlayer.load();
     fileInfo.style.display = 'none';
     songTitle.textContent = '🎵 Belum ada lagu';
-    songArtist.textContent = 'Upload file audio untuk mulai';
+    songArtist.textContent = 'Upload audio untuk mulai';
     statusBadge.textContent = '● Siap';
     statusBadge.className = 'status-badge';
     playBtn.disabled = true;
@@ -1177,11 +1316,14 @@ function resetPlayer() {
     currentTime.textContent = '0:00';
     totalTime.textContent = '0:00';
     const cover = coverArt.querySelector('.placeholder');
-    cover.innerHTML = '<i class="fas fa-music"></i>';
-    cover.style.fontSize = '64px';
+    cover.innerHTML = '<i class="fas fa-compact-disc"></i>';
+    cover.style.fontSize = '56px';
     stopSpectrum();
     setStatus('🔄 Reset selesai', 'info');
     toast('🔄 Reset', 'info');
+    isLooping = false;
+    loopBtn.style.color = '#a1a1aa';
+    loopBtn.style.borderColor = 'rgba(255,255,255,.06)';
 }
 
 // ============================================================
@@ -1228,21 +1370,17 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') {
         audioPlayer.currentTime = Math.max(audioPlayer.currentTime - 10, 0);
     }
+    if (e.key === 'l' || e.key === 'L') {
+        toggleLoop();
+    }
 });
 
 // ============================================================
-// INIT SPECTRUM
+// INIT
 // ============================================================
 initSpectrum();
-
-// ============================================================
-// BOOT FFMPEG
-// ============================================================
 bootFFmpeg();
 
-// ============================================================
-// PROTECT REFRESH
-// ============================================================
 window.addEventListener('beforeunload', (e) => {
     if (currentBlob || currentFile) {
         e.preventDefault();
@@ -1251,8 +1389,10 @@ window.addEventListener('beforeunload', (e) => {
     }
 });
 
-console.log('🎵 Aurora Player v2.0 siap!');
-console.log('💡 Upload audio, klik HQ untuk konversi kualitas tinggi');
+console.log('🎵 Aurora Sound Studio v3.0 siap!');
+console.log('💡 Upload audio, klik Studio untuk konversi 24-bit 48kHz studio grade');
+console.log('🎛️ EQ: Flat, Rock, Pop, Jazz, Classical, Bass Boost, Vocal');
+console.log('⌨️  Space = Play/Pause, L = Loop, Arrow = Seek');
 </script>
 </body>
 </html>
