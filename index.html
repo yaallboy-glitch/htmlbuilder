@@ -778,7 +778,6 @@
                     <span class="ico" data-icon="volumeHigh"></span>
                 </div>
                 <div class="actions">
-                    <button class="btn-sm studio" id="studioBtn" onclick="convertToStudio()"><span class="ico" data-icon="sparkles"></span> Studio</button>
                     <button class="btn-sm" onclick="downloadAudio()"><span class="ico" data-icon="download"></span></button>
                     <button class="btn-sm danger" onclick="resetPlayer()"><span class="ico" data-icon="trash"></span></button>
                 </div>
@@ -1038,6 +1037,7 @@ async function bootFFmpeg() {
             classWorkerURL: await toBlobURL('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js', 'text/javascript')
         });
         isReady = true;
+        captureFFmpegLogs();
         toast('Engine siap', 'ok');
         setStatus('Siap memutar audio', 'ok');
         processAutoConvertQueue();
@@ -1279,30 +1279,50 @@ function setEQ(preset) {
 }
 
 // ============================================================
-// CONVERT TO STUDIO — maximal lossless FFmpeg (32-bit float PCM WAV)
+// AUTO STUDIO RENDER — maximal lossless FFmpeg (32-bit float PCM WAV)
+// Runs automatically on upload; no manual button needed.
+// Uses 2-pass loudness measurement (linear, sample-accurate) instead
+// of single-pass dynamic normalization for the most precise result.
 // ============================================================
-function manualConvertToStudio() {
-    if (currentIndex < 0 || !items[currentIndex]) { toast('Upload audio dulu', 'info'); return; }
-    if (!isReady) { toast('Engine belum siap', 'info'); return; }
-    convertItemToStudio(currentIndex, { silent: false, auto: false });
+let ffmpegLogBuffer = [];
+let currentRenderName = '';
+function captureFFmpegLogs() {
+    ffmpeg.on('log', ({ message }) => {
+        ffmpegLogBuffer.push(message);
+        if (ffmpegLogBuffer.length > 400) ffmpegLogBuffer.shift();
+    });
+    ffmpeg.on('progress', ({ progress }) => {
+        const pct = Math.min(100, Math.round((progress || 0) * 100));
+        setStatus(`Rendering ${pct}% — ${currentRenderName}`, 'info');
+    });
 }
-// kept for backward-compat with existing onclick="convertToStudio()"
-function convertToStudio() { manualConvertToStudio(); }
+
+async function measureLoudness(inputName, preFilter) {
+    const startLen = ffmpegLogBuffer.length;
+    try {
+        await ffmpeg.exec([
+            '-i', inputName,
+            '-af', preFilter + 'loudnorm=I=-16:TP=-1.5:LRA=14:print_format=json',
+            '-f', 'null', '-'
+        ]);
+    } catch (e) { /* measurement pass failing shouldn't abort the render */ }
+    const logs = ffmpegLogBuffer.slice(startLen).join('\n');
+    const match = logs.match(/\{[\s\S]*?\}/);
+    if (!match) return null;
+    try { return JSON.parse(match[0]); } catch (e) { return null; }
+}
 
 async function convertItemToStudio(index, opts) {
     opts = opts || {};
     const it = items[index];
     if (!it || !ffmpeg) return;
     const isCurrent = index === currentIndex;
-    const btn = $('studioBtn');
 
     if (isCurrent) {
-        btn.disabled = true;
-        btn.innerHTML = icon('loader', 'spin-icon');
-        statusBadge.textContent = '🔄 Converting';
+        statusBadge.textContent = '🔄 Rendering';
         statusBadge.className = 'badge';
     }
-    if (!opts.silent) toast((opts.auto ? 'Auto-render lossless: ' : 'Mengonversi: ') + it.name, 'info');
+    if (!opts.silent) toast('Auto-render lossless: ' + it.name, 'info');
     setStatus('Rendering lossless: ' + it.name, 'info');
 
     const inputName = `in_${index}_${Date.now()}`;
@@ -1313,21 +1333,34 @@ async function convertItemToStudio(index, opts) {
         // Maximal lossless output: never downsample below source rate, minimum 48kHz.
         const outSr = Math.max(48000, info.sampleRate || 44100);
         const eq = EQ_PRESETS[currentEQ] || EQ_PRESETS.flat;
-
-        const filter = [
-            `bass=g=${eq.low}:f=320`,
-            `equalizer=g=${eq.mid}:f=1000:width_type=q:w=1`,
-            `treble=g=${eq.high}:f=3200`,
-            `loudnorm=I=-16:TP=-1.5:LRA=14`,
-            `aresample=${outSr}:filter_size=256:cutoff=0.999:phase_shift=10`,
-            `alimiter=limit=0.98:attack=3:release=50`
-        ].join(',');
+        const eqActive = eq.low !== 0 || eq.mid !== 0 || eq.high !== 0;
+        // Skip EQ coloration entirely on Flat — keeps the signal untouched for max fidelity.
+        const preFilter = eqActive
+            ? `bass=g=${eq.low}:f=320,equalizer=g=${eq.mid}:f=1000:width_type=q:w=1,treble=g=${eq.high}:f=3200,`
+            : '';
 
         await ffmpeg.writeFile(inputName, await fetchFile(it.file));
-        ffmpeg.on('progress', ({ progress }) => {
-            const pct = Math.min(100, Math.round(progress * 100));
-            setStatus(`Rendering lossless ${pct}% — ${it.name}`, 'info');
-        });
+
+        // Pass 1: measure true loudness stats (sample-accurate).
+        setStatus('Menganalisis loudness: ' + it.name, 'info');
+        const measured = await measureLoudness(inputName, preFilter);
+
+        // Pass 2: apply linear, single-shot loudness correction using the
+        // measured values — far more precise than single-pass dynamic loudnorm,
+        // then resample at full quality and brickwall-limit for safety only.
+        const loudnormStage = measured
+            ? `loudnorm=I=-16:TP=-1.5:LRA=14:measured_I=${measured.input_i}:measured_TP=${measured.input_tp}:measured_LRA=${measured.input_lra}:measured_thresh=${measured.input_thresh}:offset=${measured.target_offset}:linear=true:print_format=summary`
+            : `loudnorm=I=-16:TP=-1.5:LRA=14`;
+
+        const filter = [
+            preFilter.replace(/,$/, ''),
+            loudnormStage,
+            `aresample=${outSr}:filter_size=512:cutoff=0.999:phase_shift=10`,
+            `alimiter=limit=0.98:attack=3:release=50`
+        ].filter(Boolean).join(',');
+
+        setStatus('Rendering final: ' + it.name, 'info');
+        currentRenderName = it.name;
         await ffmpeg.exec([
             '-i', inputName,
             '-af', filter,
@@ -1384,11 +1417,6 @@ async function convertItemToStudio(index, opts) {
         setStatus('Gagal convert: ' + it.name, 'err');
         if (isCurrent) { statusBadge.textContent = '❌ Error'; statusBadge.className = 'badge'; }
         console.error(e);
-    }
-
-    if (isCurrent) {
-        btn.disabled = false;
-        btn.innerHTML = icon('sparkles') + ' Studio';
     }
 }
 
