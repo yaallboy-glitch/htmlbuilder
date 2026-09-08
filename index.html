@@ -1145,7 +1145,8 @@ async function loadItem(index) {
     currentFile = it.file;
     isStudioConverted = it.isStudio || false;
 
-    if (it.url) {
+    if (it.isStudio && it.url) {
+        // Rendered lossless result is ready — this is the only thing that ever plays.
         if (currentUrl) URL.revokeObjectURL(currentUrl);
         currentUrl = it.url;
         audioPlayer.src = currentUrl;
@@ -1155,38 +1156,45 @@ async function loadItem(index) {
         return;
     }
 
-    const url = URL.createObjectURL(it.file);
-    it.url = url;
-    if (currentUrl) URL.revokeObjectURL(currentUrl);
-    currentUrl = url;
-    audioPlayer.src = url;
+    // Not rendered yet — show metadata only. The raw/original file is never
+    // loaded into the player; playback stays disabled until the lossless
+    // FFmpeg render finishes.
+    audioPlayer.pause();
+    audioPlayer.removeAttribute('src');
     audioPlayer.load();
+    if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
 
     const info = await getAudioInfo(it.file);
     it.duration = info.duration || 0;
     it.sampleRate = info.sampleRate || 44100;
-    updateUI(it);
+    updateUI(it, { pending: true });
     renderPlaylist();
-    setStatus('Dimuat: ' + it.name, 'ok');
+    setStatus('Menunggu render lossless: ' + it.name, 'info');
 }
 
-function updateUI(it) {
+function updateUI(it, opts) {
+    opts = opts || {};
     fileName.textContent = it.file.name;
     fileSize.textContent = formatSize(it.size);
     fileDuration.textContent = formatDuration(it.duration);
     fileSampleRate.textContent = (it.sampleRate || 44100) + 'Hz';
     fileInfo.style.display = 'grid';
-    songTitle.textContent = it.name;
-    songArtist.textContent = (it.sampleRate || 44100) + 'Hz · ' + formatSize(it.size);
-    statusBadge.textContent = '● Siap';
-    statusBadge.className = 'badge';
-    playBtn.disabled = false;
+    songTitle.textContent = it.name + (it.isStudio ? ' [Studio]' : '');
     const cover = coverArt.querySelector('.placeholder');
     cover.innerHTML = icon('headphones');
     cover.style.fontSize = '40px';
     bindAudioEvents();
-    if (it.blob) {
-        // Sudah studio converted
+
+    if (opts.pending) {
+        songArtist.textContent = 'Merender lossless...';
+        statusBadge.textContent = '🔄 Rendering';
+        statusBadge.className = 'badge';
+        playBtn.disabled = true;
+    } else {
+        songArtist.textContent = (it.sampleRate || 44100) + 'Hz · ' + formatSize(it.size) + (it.isStudio ? ' · Studio' : '');
+        statusBadge.textContent = '● Siap';
+        statusBadge.className = 'badge';
+        playBtn.disabled = false;
     }
 }
 
@@ -1195,6 +1203,12 @@ function updateUI(it) {
 // ============================================================
 function playFromPlaylist(index) {
     if (index === currentIndex && isPlaying) { togglePlay(); return; }
+    const it = items[index];
+    if (it && !it.isStudio) {
+        loadItem(index);
+        toast('Masih merender lossless, tunggu sebentar...', 'info');
+        return;
+    }
     loadItem(index);
     setTimeout(() => audioPlayer.play().catch(() => {}), 200);
 }
@@ -1391,6 +1405,7 @@ async function convertItemToStudio(index, opts) {
             isStudioConverted = true;
             audioPlayer.src = currentUrl;
             audioPlayer.load();
+            playBtn.disabled = false;
             if (wasPlaying) {
                 audioPlayer.currentTime = resumeAt;
                 audioPlayer.play().catch(() => {});
@@ -1424,13 +1439,11 @@ async function convertItemToStudio(index, opts) {
 // DOWNLOAD
 // ============================================================
 function downloadAudio() {
-    if (!audioPlayer.src) { toast('Tidak ada audio', 'info'); return; }
     const it = items[currentIndex];
-    if (!it) return;
-    const blob = it.blob || it.file;
+    if (!it || !it.isStudio || !it.blob) { toast('Belum ada hasil render untuk diunduh', 'info'); return; }
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = it.name + (it.isStudio ? '_Studio.wav' : '.wav');
+    a.href = URL.createObjectURL(it.blob);
+    a.download = it.name + '_Studio.wav';
     document.body.appendChild(a);
     a.click();
     a.remove();
