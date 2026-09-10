@@ -13,7 +13,6 @@
     <style>
         /* ===== RESET ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        /* ===== ICONS (inline SVG, always white) ===== */
         .ico, .i-svg {
             display: inline-flex;
             align-items: center;
@@ -27,20 +26,12 @@
             flex-shrink: 0;
         }
         .ico.dim .i-svg { opacity: .45; }
-        .ico.spin .i-svg { animation: icoSpin .8s linear infinite; }
-        .i-svg.dim-cover { opacity: .3; }
-        .i-svg.spin-icon { animation: icoSpin .8s linear infinite; }
         @keyframes icoSpin { to { transform: rotate(360deg); } }
         :root {
             --bg: #0a0a0a;
             --glass: rgba(255,255,255,.04);
-            --glass-light: rgba(255,255,255,.06);
             --glass-border: rgba(255,255,255,.07);
             --text: #e8e8e8;
-            --text-dim: #777;
-            --text-muted: #444;
-            --accent: #888;
-            --accent-hover: #bbb;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -75,82 +66,48 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .brand { display: flex; align-items: center; gap: 10px; }
         .brand .logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 40px; height: 40px; border-radius: 10px;
             background: rgba(255,255,255,.06);
             border: 1px solid rgba(255,255,255,.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: #aaa;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #aaa;
         }
-        .brand h1 {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: #eee;
-        }
+        .brand h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; color: #eee; }
         .brand h1 span { color: #666; font-weight: 300; }
         .brand .ver {
-            font-size: 9px;
-            font-weight: 500;
-            color: #444;
-            background: rgba(255,255,255,.04);
-            padding: 2px 8px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,.04);
+            font-size: 9px; font-weight: 500; color: #444;
+            background: rgba(255,255,255,.04); padding: 2px 8px;
+            border-radius: 10px; border: 1px solid rgba(255,255,255,.04);
         }
         .status-chip {
-            font-size: 9px;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 20px;
+            font-size: 9px; font-weight: 600;
+            padding: 4px 12px; border-radius: 20px;
             background: rgba(255,255,255,.04);
             border: 1px solid rgba(255,255,255,.06);
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            color: #666; display: flex; align-items: center; gap: 5px;
         }
-        .status-chip .dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #444;
-        }
+        .status-chip .dot { width: 5px; height: 5px; border-radius: 50%; background: #444; }
         .status-chip .dot.active { background: #888; }
 
         /* ===== LAYOUT ===== */
-        .layout {
-            display: grid;
-            grid-template-columns: 1fr 280px;
-            gap: 20px;
-        }
+        .layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; }
+        .main { display: flex; flex-direction: column; gap: 16px; }
 
-        /* ===== MAIN (Player) ===== */
-        .main {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* ===== UPLOAD ZONE ===== */
+        /* ===== UPLOAD ZONE (COMPACT) ===== */
         .upload-zone {
             border: 1.5px dashed rgba(255,255,255,.06);
-            border-radius: 14px;
-            padding: 18px 16px;
+            border-radius: 10px;
+            padding: 10px 14px;
             text-align: center;
             cursor: pointer;
             transition: all .25s ease;
             background: rgba(255,255,255,.02);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .upload-zone:hover {
             border-color: rgba(255,255,255,.12);
@@ -160,38 +117,9 @@
             border-color: rgba(255,255,255,.2);
             background: rgba(255,255,255,.05);
         }
-        .upload-zone .icon {
-            font-size: 24px;
-            color: #444;
-            margin-bottom: 2px;
-        }
-        .upload-zone .title {
-            font-size: 12px;
-            font-weight: 500;
-            color: #888;
-        }
+        .upload-zone .icon { font-size: 14px; color: #555; }
+        .upload-zone .title { font-size: 11px; font-weight: 500; color: #888; }
         .upload-zone .title b { color: #ccc; font-weight: 600; }
-        .upload-zone .sub {
-            font-size: 9px;
-            color: #444;
-            margin-top: 2px;
-        }
-        .upload-zone .formats {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-top: 6px;
-            flex-wrap: wrap;
-        }
-        .upload-zone .formats span {
-            font-size: 7px;
-            font-weight: 600;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: rgba(255,255,255,.03);
-            border: 1px solid rgba(255,255,255,.04);
-            color: #555;
-        }
         input[type="file"] { display: none; }
 
         /* ===== FILE INFO ===== */
@@ -206,11 +134,7 @@
             font-size: 10px;
             color: #666;
         }
-        .file-info .row {
-            display: flex;
-            justify-content: space-between;
-            padding: 2px 0;
-        }
+        .file-info .row { display: flex; justify-content: space-between; padding: 2px 0; }
         .file-info .row .label { color: #555; }
         .file-info .row .value { color: #ccc; font-weight: 500; }
 
@@ -228,16 +152,10 @@
             position: relative;
             overflow: hidden;
         }
-        .cover .placeholder {
-            font-size: 48px;
-            color: #333;
-            opacity: .3;
-        }
+        .cover .placeholder { font-size: 48px; color: #333; opacity: .3; }
         .cover .spectrum {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             height: 60px;
             display: flex;
             align-items: flex-end;
@@ -256,191 +174,150 @@
             min-height: 2px;
         }
 
-        /* ===== SONG INFO ===== */
-        .song-info {
-            text-align: center;
-            padding: 2px 0;
-        }
-        .song-info .title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #eee;
+        /* ===== COVER OVERLAY TEXT ===== */
+        .cover .overlay {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 10px;
+            font-weight: 500;
+            color: #ccc;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity .3s ease;
+            pointer-events: none;
         }
-        .song-info .artist {
-            font-size: 12px;
-            color: #666;
-            margin-top: 2px;
+        .cover .overlay.show { opacity: 1; }
+        .cover .overlay .spinner-icon {
+            width: 12px; height: 12px;
+            border: 2px solid rgba(255,255,255,.2);
+            border-top-color: #ccc;
+            border-radius: 50%;
+            animation: icoSpin .8s linear infinite;
+            flex-shrink: 0;
         }
+        .cover .overlay .status-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #888;
+            flex-shrink: 0;
+        }
+        .cover .overlay .status-dot.active {
+            background: #4ade80;
+            box-shadow: 0 0 8px rgba(74,222,128,.6);
+        }
+        .cover .overlay .status-dot.error { background: #f87171; }
+
+        /* ===== SONG INFO ===== */
+        .song-info { text-align: center; padding: 2px 0; }
+        .song-info .title {
+            font-size: 18px; font-weight: 600; color: #eee;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .song-info .artist { font-size: 12px; color: #666; margin-top: 2px; }
         .song-info .badge {
-            display: inline-block;
-            font-size: 8px;
-            font-weight: 600;
-            padding: 2px 12px;
-            border-radius: 10px;
-            margin-top: 4px;
-            background: rgba(255,255,255,.04);
-            color: #666;
+            display: inline-block; font-size: 8px; font-weight: 600;
+            padding: 2px 12px; border-radius: 10px; margin-top: 4px;
+            background: rgba(255,255,255,.04); color: #666;
             border: 1px solid rgba(255,255,255,.04);
         }
         .song-info .badge.playing {
-            background: rgba(255,255,255,.06);
-            color: #aaa;
+            background: rgba(255,255,255,.06); color: #aaa;
             border-color: rgba(255,255,255,.08);
         }
 
         /* ===== CONTROLS ===== */
         .controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            padding: 4px 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 14px; padding: 4px 0;
         }
         .controls .btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+            width: 36px; height: 36px; border-radius: 50%;
             border: 1px solid rgba(255,255,255,.06);
             background: rgba(255,255,255,.03);
-            color: #666;
-            font-size: 13px;
-            cursor: pointer;
+            color: #666; font-size: 13px; cursor: pointer;
             transition: all .2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
         .controls .btn:hover {
             background: rgba(255,255,255,.06);
-            color: #ccc;
-            border-color: rgba(255,255,255,.1);
+            color: #ccc; border-color: rgba(255,255,255,.1);
         }
         .controls .btn:active { transform: scale(.94); }
-        .controls .btn:disabled {
-            opacity: .2;
-            cursor: not-allowed;
-            transform: none !important;
-        }
+        .controls .btn:disabled { opacity: .2; cursor: not-allowed; transform: none !important; }
         .controls .btn.play {
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             background: rgba(255,255,255,.06);
             border-color: rgba(255,255,255,.08);
-            color: #ddd;
-            font-size: 16px;
+            color: #ddd; font-size: 16px;
         }
         .controls .btn.play:hover {
             background: rgba(255,255,255,.08);
             border-color: rgba(255,255,255,.12);
             color: #fff;
         }
-        .controls .btn.loop-on {
-            color: #888;
-            border-color: rgba(255,255,255,.1);
-        }
+        .controls .btn.loop-on { color: #888; border-color: rgba(255,255,255,.1); }
 
         /* ===== PROGRESS ===== */
         .progress-wrap {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 2px 0;
+            display: flex; align-items: center; gap: 10px; padding: 2px 0;
         }
         .progress-wrap .time {
-            font-size: 10px;
-            font-variant-numeric: tabular-nums;
-            color: #555;
-            min-width: 32px;
-            font-weight: 500;
+            font-size: 10px; font-variant-numeric: tabular-nums;
+            color: #555; min-width: 32px; font-weight: 500;
         }
         .progress-wrap .time:first-child { text-align: right; }
         .progress-wrap .time:last-child { text-align: left; }
         .progress-bar {
-            flex: 1;
-            height: 3px;
-            background: rgba(255,255,255,.06);
-            border-radius: 2px;
-            position: relative;
-            cursor: pointer;
+            flex: 1; height: 3px; background: rgba(255,255,255,.06);
+            border-radius: 2px; position: relative; cursor: pointer;
         }
         .progress-bar .fill {
-            height: 100%;
-            width: 0%;
+            height: 100%; width: 0%;
             background: rgba(255,255,255,.15);
-            border-radius: 2px;
-            transition: width .05s linear;
+            border-radius: 2px; transition: width .05s linear;
         }
 
         /* ===== BOTTOM BAR ===== */
         .bottom-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,.04);
-            flex-wrap: wrap;
-            gap: 8px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding-top: 10px; border-top: 1px solid rgba(255,255,255,.04);
+            flex-wrap: wrap; gap: 8px;
         }
-        .volume {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-            min-width: 100px;
-        }
-        .volume i { font-size: 11px; color: #555; }
+        .volume { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 100px; }
         .volume input[type="range"] {
-            flex: 1;
-            max-width: 80px;
-            height: 2px;
-            -webkit-appearance: none;
-            background: rgba(255,255,255,.06);
-            border-radius: 2px;
-            outline: none;
+            flex: 1; max-width: 80px; height: 2px;
+            -webkit-appearance: none; background: rgba(255,255,255,.06);
+            border-radius: 2px; outline: none;
         }
         .volume input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 10px;
-            height: 10px;
+            -webkit-appearance: none; width: 10px; height: 10px;
             background: rgba(255,255,255,.15);
-            border-radius: 50%;
-            cursor: pointer;
+            border-radius: 50%; cursor: pointer;
         }
-        .actions {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
+        .actions { display: flex; gap: 4px; flex-wrap: wrap; }
         .actions .btn-sm {
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 4px 10px; border-radius: 6px;
             border: 1px solid rgba(255,255,255,.04);
             background: rgba(255,255,255,.02);
-            color: #666;
-            font-size: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-            display: flex;
-            align-items: center;
-            gap: 3px;
+            color: #666; font-size: 8px; font-weight: 600;
+            cursor: pointer; transition: all .2s;
+            display: flex; align-items: center; gap: 3px;
         }
         .actions .btn-sm:hover {
             background: rgba(255,255,255,.05);
-            color: #aaa;
-            border-color: rgba(255,255,255,.08);
-        }
-        .actions .btn-sm.studio {
-            background: rgba(255,255,255,.04);
-            border-color: rgba(255,255,255,.06);
-            color: #888;
-        }
-        .actions .btn-sm.studio:hover {
-            background: rgba(255,255,255,.06);
-            color: #ccc;
+            color: #aaa; border-color: rgba(255,255,255,.08);
         }
         .actions .btn-sm.danger:hover {
             background: rgba(255,255,255,.04);
@@ -449,29 +326,18 @@
 
         /* ===== EQ ===== */
         .eq-row {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 4px 0;
+            display: flex; gap: 4px; flex-wrap: wrap;
+            justify-content: center; padding: 4px 0;
         }
         .eq-row .eq-btn {
-            padding: 2px 10px;
-            border-radius: 4px;
+            padding: 2px 10px; border-radius: 4px;
             border: 1px solid rgba(255,255,255,.04);
             background: rgba(255,255,255,.02);
-            color: #555;
-            font-size: 7px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-            text-transform: uppercase;
-            letter-spacing: .3px;
+            color: #555; font-size: 7px; font-weight: 600;
+            cursor: pointer; transition: all .2s;
+            text-transform: uppercase; letter-spacing: .3px;
         }
-        .eq-row .eq-btn:hover {
-            background: rgba(255,255,255,.04);
-            color: #888;
-        }
+        .eq-row .eq-btn:hover { background: rgba(255,255,255,.04); color: #888; }
         .eq-row .eq-btn.active {
             background: rgba(255,255,255,.06);
             border-color: rgba(255,255,255,.08);
@@ -482,49 +348,30 @@
         .sidebar {
             background: rgba(255,255,255,.02);
             border: 1px solid rgba(255,255,255,.04);
-            border-radius: 14px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
+            border-radius: 14px; padding: 14px;
+            display: flex; flex-direction: column;
             max-height: 520px;
         }
         .sidebar .title {
-            font-size: 10px;
-            font-weight: 600;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: .5px;
+            font-size: 10px; font-weight: 600; color: #555;
+            text-transform: uppercase; letter-spacing: .5px;
             margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .sidebar .title .count {
-            font-size: 8px;
-            font-weight: 400;
-            color: #444;
-        }
+        .sidebar .title .count { font-size: 8px; font-weight: 400; color: #444; }
         .playlist {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            flex: 1; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 4px;
         }
         .playlist::-webkit-scrollbar { width: 3px; }
         .playlist::-webkit-scrollbar-track { background: transparent; }
         .playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,.06); border-radius: 2px; }
-
         .playlist-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            border-radius: 8px;
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 8px;
             background: rgba(255,255,255,.02);
             border: 1px solid transparent;
-            cursor: pointer;
-            transition: all .2s ease;
+            cursor: pointer; transition: all .2s ease;
         }
         .playlist-item:hover {
             background: rgba(255,255,255,.03);
@@ -535,31 +382,15 @@
             border-color: rgba(255,255,255,.06);
         }
         .playlist-item .idx {
-            font-size: 9px;
-            font-weight: 600;
-            color: #444;
-            min-width: 20px;
+            font-size: 9px; font-weight: 600; color: #444; min-width: 20px;
         }
-        .playlist-item .info {
-            flex: 1;
-            min-width: 0;
-        }
+        .playlist-item .info { flex: 1; min-width: 0; }
         .playlist-item .info .name {
-            font-size: 11px;
-            font-weight: 500;
-            color: #ccc;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 11px; font-weight: 500; color: #ccc;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .playlist-item .info .meta {
-            font-size: 8px;
-            color: #444;
-        }
-        .playlist-item .status-icon {
-            font-size: 10px;
-            color: #444;
-        }
+        .playlist-item .info .meta { font-size: 8px; color: #444; }
+        .playlist-item .status-icon { font-size: 10px; color: #444; }
         .playlist-item .status-icon.playing {
             color: #888;
             animation: pulseDot 1.2s ease-in-out infinite;
@@ -569,48 +400,30 @@
             50% { opacity: .3; }
         }
         .playlist-empty {
-            font-size: 10px;
-            color: #444;
-            text-align: center;
-            padding: 30px 0;
+            font-size: 10px; color: #444;
+            text-align: center; padding: 30px 0;
         }
         .playlist-empty i {
-            font-size: 24px;
-            color: #333;
-            display: block;
-            margin-bottom: 6px;
+            font-size: 24px; color: #333; display: block; margin-bottom: 6px;
         }
 
         /* ===== STATUS TEXT ===== */
         .status-text {
-            font-size: 9px;
-            color: #444;
-            text-align: center;
-            min-height: 14px;
-            padding-top: 6px;
+            font-size: 9px; color: #444;
+            text-align: center; min-height: 14px; padding-top: 6px;
         }
-        .status-text .ok { color: #888; }
-        .status-text .err { color: #666; }
-        .status-text .info { color: #666; }
 
         /* ===== TOAST ===== */
         .toast-wrap {
-            position: fixed;
-            top: 20px;
-            left: 50%;
+            position: fixed; top: 20px; left: 50%;
             transform: translateX(-50%);
             z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            pointer-events: none;
-            max-width: 90vw;
+            display: flex; flex-direction: column; gap: 4px;
+            pointer-events: none; max-width: 90vw;
         }
         .toast-item {
-            padding: 8px 18px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 500;
+            padding: 8px 18px; border-radius: 10px;
+            font-size: 11px; font-weight: 500;
             background: rgba(10,10,10,.92);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255,255,255,.06);
@@ -618,14 +431,9 @@
             animation: toastIn .3s ease, toastOut .3s ease 2.8s forwards;
             pointer-events: auto;
             box-shadow: 0 10px 30px rgba(0,0,0,.5);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            display: flex; align-items: center; gap: 8px;
         }
         .toast-item .icon { font-size: 13px; }
-        .toast-item.ok .icon { color: #888; }
-        .toast-item.err .icon { color: #666; }
-        .toast-item.info .icon { color: #666; }
         @keyframes toastIn {
             from { opacity: 0; transform: translateY(-12px); }
             to { opacity: 1; transform: translateY(0); }
@@ -657,9 +465,6 @@
             .actions { justify-content: center; }
             .sidebar { max-height: 180px; padding: 10px; }
             .playlist-item .info .name { font-size: 10px; }
-            .upload-zone { padding: 14px 12px; }
-            .upload-zone .icon { font-size: 20px; }
-            .upload-zone .title { font-size: 11px; }
         }
         @media(max-width: 400px) {
             .app { padding: 8px; border-radius: 12px; }
@@ -674,7 +479,6 @@
             .sidebar { max-height: 140px; padding: 8px; }
             .playlist-item { padding: 5px 8px; }
             .playlist-item .info .name { font-size: 9px; }
-            .status-chip { font-size: 8px; padding: 2px 8px; }
         }
     </style>
 </head>
@@ -709,15 +513,10 @@
         <!-- MAIN -->
         <div class="main">
 
-            <!-- UPLOAD -->
+            <!-- UPLOAD (compact) -->
             <div class="upload-zone" id="uploadZone">
-                <div class="icon"><span class="ico dim" data-icon="upload"></span></div>
+                <span class="ico dim" data-icon="upload"></span>
                 <div class="title"><b>Klik atau tarik</b> file audio</div>
-                <div class="sub">MP3, WAV, FLAC, OGG, M4A, AAC, OPUS</div>
-                <div class="formats">
-                    <span>MP3</span><span>WAV</span><span>FLAC</span>
-                    <span>OGG</span><span>M4A</span><span>AAC</span>
-                </div>
             </div>
             <input type="file" id="fileInput" accept=".mp3,.wav,.flac,.ogg,.m4a,.aac,.opus" multiple>
 
@@ -733,6 +532,7 @@
             <div class="cover" id="coverArt">
                 <div class="placeholder"><span class="ico dim" data-icon="disc" style="font-size:1em"></span></div>
                 <div class="spectrum" id="spectrum"></div>
+                <div class="overlay" id="coverOverlay"></div>
             </div>
 
             <!-- SONG INFO -->
@@ -811,7 +611,7 @@ const { FFmpeg } = FFmpegWASM;
 const { toBlobURL, fetchFile } = FFmpegUtil;
 
 // ============================================================
-// ICONS (inline SVG — no external font/CDN dependency, always white)
+// ICONS
 // ============================================================
 const ICON_PATHS = {
     headphones: '<path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><rect x="1" y="15" width="4.5" height="7" rx="1.5"></rect><rect x="18.5" y="15" width="4.5" height="7" rx="1.5"></rect>',
@@ -822,21 +622,19 @@ const ICON_PATHS = {
     repeat: '<polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path>',
     volumeLow: '<polygon points="10 5 5 9 1 9 1 15 5 15 10 19 10 5"></polygon><path d="M15 8.5a5 5 0 0 1 0 7"></path>',
     volumeHigh: '<polygon points="10 5 5 9 1 9 1 15 5 15 10 19 10 5"></polygon><path d="M15 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a10 10 0 0 1 0 13"></path>',
-    sparkles: '<path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M4.9 4.9l2.8 2.8"></path><path d="M16.3 16.3l2.8 2.8"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="M4.9 19.1l2.8-2.8"></path><path d="M16.3 7.7l2.8-2.8"></path>',
     download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>',
     trash: '<polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>',
     checkCircle: '<path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"></path><polyline points="22 4 12 14.1 9 11.1"></polyline>',
     alertCircle: '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>',
-    inbox: '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>',
-    loader: '<line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>'
+    inbox: '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>'
 };
 function icon(name, extraClass) {
     const cls = extraClass ? ' ' + extraClass : '';
-    if (name === 'play') return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
-    if (name === 'pause') return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
-    if (name === 'dot') return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="6"></circle></svg>`;
+    if (name === 'play') return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
+    if (name === 'pause') return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
+    if (name === 'dot') return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"></circle></svg>`;
     const body = ICON_PATHS[name] || '';
-    return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+    return `<svg class="i-svg${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
 }
 function initIcons(root) {
     (root || document).querySelectorAll('[data-icon]').forEach(el => {
@@ -856,6 +654,7 @@ const fileSize = $('fileSize');
 const fileDuration = $('fileDuration');
 const fileSampleRate = $('fileSampleRate');
 const coverArt = $('coverArt');
+const coverOverlay = $('coverOverlay');
 const spectrum = $('spectrum');
 const songTitle = $('songTitle');
 const songArtist = $('songArtist');
@@ -896,6 +695,10 @@ let analyser = null;
 let dataArray = null;
 let animationId = null;
 let spectrumBars = [];
+let autoConvertQueue = [];
+let isAutoConverting = false;
+let ffmpegLogBuffer = [];
+let currentRenderName = '';
 
 const EQ_PRESETS = {
     flat: { low: 0, mid: 0, high: 0 },
@@ -917,6 +720,21 @@ function toast(msg, type = 'info') {
     el.innerHTML = `<span class="icon">${icon(iconName[type] || iconName.info)}</span><span>${msg}</span>`;
     wrap.appendChild(el);
     setTimeout(() => { if (el.parentNode) el.remove(); }, 2800);
+}
+
+// ============================================================
+// COVER OVERLAY
+// ============================================================
+function showCoverOverlay(text, type) {
+    if (!coverOverlay) return;
+    coverOverlay.classList.add('show');
+    const spinner = type === 'rendering' ? '<span class="spinner-icon"></span>' : '';
+    const dotClass = type === 'ok' ? 'active' : (type === 'error' ? 'error' : '');
+    const dot = type !== 'rendering' ? `<span class="status-dot ${dotClass}"></span>` : '';
+    coverOverlay.innerHTML = `${spinner}${dot}<span>${text}</span>`;
+}
+function hideCoverOverlay() {
+    if (coverOverlay) coverOverlay.classList.remove('show');
 }
 
 // ============================================================
@@ -980,7 +798,6 @@ function initSpectrum() {
         spectrumBars.push(bar);
     }
 }
-
 function startSpectrum() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -996,7 +813,6 @@ function startSpectrum() {
     spectrum.classList.add('active');
     animateSpectrum();
 }
-
 function animateSpectrum() {
     if (!analyser) return;
     analyser.getByteFrequencyData(dataArray);
@@ -1007,7 +823,6 @@ function animateSpectrum() {
     }
     animationId = requestAnimationFrame(animateSpectrum);
 }
-
 function stopSpectrum() {
     spectrum.classList.remove('active');
     if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
@@ -1054,12 +869,7 @@ function renderPlaylist() {
     prevBtn.disabled = items.length < 2;
     nextBtn.disabled = items.length < 2;
     if (!items.length) {
-        playlist.innerHTML = `
-            <div class="playlist-empty">
-                ${icon('inbox')}
-                <span>Belum ada lagu</span>
-            </div>
-        `;
+        playlist.innerHTML = `<div class="playlist-empty">${icon('inbox')}<span>Belum ada lagu</span></div>`;
         playlistCount.textContent = '0 lagu';
         return;
     }
@@ -1101,7 +911,7 @@ async function addFiles(files) {
             sampleRate: info.sampleRate || 44100,
             blob: null,
             url: null,
-            rawUrl: URL.createObjectURL(file), // playable segera, tanpa menunggu render selesai
+            rawUrl: URL.createObjectURL(file),
             isStudio: false
         });
         toast('+ ' + file.name, 'ok');
@@ -1115,16 +925,12 @@ async function addFiles(files) {
 }
 
 // ============================================================
-// AUTO-CONVERT ON UPLOAD (lossless, best quality)
+// AUTO-CONVERT QUEUE
 // ============================================================
-let autoConvertQueue = [];
-let isAutoConverting = false;
-
 function queueAutoConvert(index) {
     autoConvertQueue.push(index);
     processAutoConvertQueue();
 }
-
 async function processAutoConvertQueue() {
     if (isAutoConverting || !isReady) return;
     isAutoConverting = true;
@@ -1149,7 +955,6 @@ async function loadItem(index) {
     isStudioConverted = it.isStudio || false;
 
     if (it.isStudio && it.url) {
-        // Rendered lossless result sudah siap — pakai ini.
         if (currentUrl && currentUrl !== it.url) URL.revokeObjectURL(currentUrl);
         currentUrl = it.url;
         audioPlayer.src = currentUrl;
@@ -1159,8 +964,6 @@ async function loadItem(index) {
         return;
     }
 
-    // Belum selesai di-render — tetap bisa diputar pakai file asli (rawUrl),
-    // sementara render lossless jalan di background lewat auto-convert queue.
     if (!it.rawUrl) it.rawUrl = URL.createObjectURL(it.file);
     if (currentUrl && currentUrl !== it.rawUrl) URL.revokeObjectURL(currentUrl);
     currentUrl = it.rawUrl;
@@ -1171,6 +974,9 @@ async function loadItem(index) {
     setStatus('Memutar versi asli, merender lossless: ' + it.name, 'info');
 }
 
+// ============================================================
+// UPDATE UI
+// ============================================================
 function updateUI(it, opts) {
     opts = opts || {};
     fileName.textContent = it.file.name;
@@ -1185,15 +991,17 @@ function updateUI(it, opts) {
     bindAudioEvents();
 
     if (opts.pending) {
-        songArtist.textContent = (it.sampleRate || 44100) + 'Hz · ' + formatSize(it.size) + ' · Original (merender lossless...)';
+        songArtist.textContent = (it.sampleRate || 44100) + 'Hz · ' + formatSize(it.size) + ' · Original';
         statusBadge.textContent = '🔄 Rendering';
         statusBadge.className = 'badge';
         playBtn.disabled = false;
+        showCoverOverlay('Merender lossless...', 'rendering');
     } else {
         songArtist.textContent = (it.sampleRate || 44100) + 'Hz · ' + formatSize(it.size) + (it.isStudio ? ' · Studio' : '');
         statusBadge.textContent = '● Siap';
         statusBadge.className = 'badge';
         playBtn.disabled = false;
+        hideCoverOverlay();
     }
 }
 
@@ -1205,20 +1013,17 @@ function playFromPlaylist(index) {
     if (index === currentIndex && audioPlayer.src) { audioPlayer.play().catch(() => {}); return; }
     loadAndPlay(index);
 }
-
 function loadAndPlay(index) {
     const it = items[index];
     if (it && !it.isStudio) toast('Memutar versi asli, versi lossless masih dirender...', 'info');
     loadItem(index);
     setTimeout(() => audioPlayer.play().catch(() => {}), 200);
 }
-
 function playPrev() {
     if (items.length < 2) return;
     const idx = (currentIndex - 1 + items.length) % items.length;
     loadAndPlay(idx);
 }
-
 function playNext() {
     if (items.length < 2) return;
     const idx = (currentIndex + 1) % items.length;
@@ -1258,19 +1063,14 @@ function bindAudioEvents() {
     };
     audioPlayer.onended = () => {
         if (isLooping) { audioPlayer.currentTime = 0; audioPlayer.play(); return; }
-        if (items.length > 1 && currentIndex < items.length - 1) {
-            playNext();
-            return;
-        }
+        if (items.length > 1 && currentIndex < items.length - 1) { playNext(); return; }
         playIcon.innerHTML = icon('play');
         statusBadge.textContent = '● Selesai';
         statusBadge.className = 'badge';
         stopSpectrum();
         renderPlaylist();
     };
-    audioPlayer.onerror = () => {
-        toast('Error memutar audio', 'err');
-    };
+    audioPlayer.onerror = () => { toast('Error memutar audio', 'err'); };
     volumeSlider.oninput = () => { audioPlayer.volume = volumeSlider.value / 100; };
     audioPlayer.volume = volumeSlider.value / 100;
     progressBar.onclick = (e) => {
@@ -1311,13 +1111,8 @@ function setEQ(preset) {
 }
 
 // ============================================================
-// AUTO STUDIO RENDER — maximal lossless FFmpeg (32-bit float PCM WAV)
-// Runs automatically on upload; no manual button needed.
-// Uses 2-pass loudness measurement (linear, sample-accurate) instead
-// of single-pass dynamic normalization for the most precise result.
+// CAPTURE FFMPEG LOGS
 // ============================================================
-let ffmpegLogBuffer = [];
-let currentRenderName = '';
 function captureFFmpegLogs() {
     ffmpeg.on('log', ({ message }) => {
         ffmpegLogBuffer.push(message);
@@ -1326,9 +1121,15 @@ function captureFFmpegLogs() {
     ffmpeg.on('progress', ({ progress }) => {
         const pct = Math.min(100, Math.round((progress || 0) * 100));
         setStatus(`Rendering ${pct}% — ${currentRenderName}`, 'info');
+        if (currentRenderName) {
+            showCoverOverlay(`Merender ${pct}%`, 'rendering');
+        }
     });
 }
 
+// ============================================================
+// MEASURE LOUDNESS
+// ============================================================
 async function measureLoudness(inputName, preFilter) {
     const startLen = ffmpegLogBuffer.length;
     try {
@@ -1337,13 +1138,16 @@ async function measureLoudness(inputName, preFilter) {
             '-af', preFilter + 'loudnorm=I=-16:TP=-1.5:LRA=14:print_format=json',
             '-f', 'null', '-'
         ]);
-    } catch (e) { /* measurement pass failing shouldn't abort the render */ }
+    } catch (e) {}
     const logs = ffmpegLogBuffer.slice(startLen).join('\n');
     const match = logs.match(/\{[\s\S]*?\}/);
     if (!match) return null;
     try { return JSON.parse(match[0]); } catch (e) { return null; }
 }
 
+// ============================================================
+// CONVERT ITEM TO STUDIO
+// ============================================================
 async function convertItemToStudio(index, opts) {
     opts = opts || {};
     const it = items[index];
@@ -1353,33 +1157,29 @@ async function convertItemToStudio(index, opts) {
     if (isCurrent) {
         statusBadge.textContent = '🔄 Rendering';
         statusBadge.className = 'badge';
+        showCoverOverlay('Merender lossless...', 'rendering');
     }
     if (!opts.silent) toast('Auto-render lossless: ' + it.name, 'info');
     setStatus('Rendering lossless: ' + it.name, 'info');
+    currentRenderName = it.name;
 
     const inputName = `in_${index}_${Date.now()}`;
     const outputName = `out_${index}_${Date.now()}.wav`;
 
     try {
         const info = await getAudioInfo(it.file);
-        // Maximal lossless output: never downsample below source rate, minimum 48kHz.
         const outSr = Math.max(48000, info.sampleRate || 44100);
         const eq = EQ_PRESETS[currentEQ] || EQ_PRESETS.flat;
         const eqActive = eq.low !== 0 || eq.mid !== 0 || eq.high !== 0;
-        // Skip EQ coloration entirely on Flat — keeps the signal untouched for max fidelity.
         const preFilter = eqActive
             ? `bass=g=${eq.low}:f=320,equalizer=g=${eq.mid}:f=1000:width_type=q:w=1,treble=g=${eq.high}:f=3200,`
             : '';
 
         await ffmpeg.writeFile(inputName, await fetchFile(it.file));
 
-        // Pass 1: measure true loudness stats (sample-accurate).
         setStatus('Menganalisis loudness: ' + it.name, 'info');
         const measured = await measureLoudness(inputName, preFilter);
 
-        // Pass 2: apply linear, single-shot loudness correction using the
-        // measured values — far more precise than single-pass dynamic loudnorm,
-        // then resample at full quality and brickwall-limit for safety only.
         const loudnormStage = measured
             ? `loudnorm=I=-16:TP=-1.5:LRA=14:measured_I=${measured.input_i}:measured_TP=${measured.input_tp}:measured_LRA=${measured.input_lra}:measured_thresh=${measured.input_thresh}:offset=${measured.target_offset}:linear=true:print_format=summary`
             : `loudnorm=I=-16:TP=-1.5:LRA=14`;
@@ -1392,13 +1192,12 @@ async function convertItemToStudio(index, opts) {
         ].filter(Boolean).join(',');
 
         setStatus('Rendering final: ' + it.name, 'info');
-        currentRenderName = it.name;
         await ffmpeg.exec([
             '-i', inputName,
             '-af', filter,
             '-map_metadata', '-1',
             '-fflags', '+bitexact',
-            '-c:a', 'pcm_f32le',   // 32-bit float PCM — maximum lossless fidelity
+            '-c:a', 'pcm_f32le',
             '-ar', String(outSr),
             '-y', outputName
         ]);
@@ -1435,6 +1234,9 @@ async function convertItemToStudio(index, opts) {
             songTitle.textContent = it.name + ' [Studio]';
             statusBadge.textContent = '✅ Studio';
             statusBadge.className = 'badge';
+            // Tampilkan overlay sukses, hilang setelah 2.5 detik
+            showCoverOverlay('Studio 32-bit float siap!', 'ok');
+            setTimeout(() => hideCoverOverlay(), 2500);
         } else if (oldItemUrl) {
             URL.revokeObjectURL(oldItemUrl);
         }
@@ -1449,7 +1251,12 @@ async function convertItemToStudio(index, opts) {
     } catch (e) {
         toast('Gagal render ' + it.name + ': ' + e.message, 'err');
         setStatus('Gagal convert: ' + it.name, 'err');
-        if (isCurrent) { statusBadge.textContent = '❌ Error'; statusBadge.className = 'badge'; }
+        if (isCurrent) {
+            statusBadge.textContent = '❌ Error';
+            statusBadge.className = 'badge';
+            showCoverOverlay('Gagal render', 'error');
+            setTimeout(() => hideCoverOverlay(), 3000);
+        }
         console.error(e);
     }
 }
@@ -1500,6 +1307,7 @@ function resetPlayer() {
     const cover = coverArt.querySelector('.placeholder');
     cover.innerHTML = icon('disc');
     cover.style.fontSize = '48px';
+    hideCoverOverlay();
     stopSpectrum();
     setStatus('Reset selesai', 'info');
     toast('Reset', 'info');
@@ -1548,7 +1356,6 @@ window.addEventListener('beforeunload', e => {
 });
 
 console.log('🎵 Aurora Sound v3.0 — Minimalist Studio Player');
-console.log('📂 Upload audio, pilih EQ, klik Studio untuk konversi 24-bit 48kHz');
 </script>
 </body>
 </html>
