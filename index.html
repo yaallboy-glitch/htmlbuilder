@@ -91,6 +91,7 @@
   .upload-zone .ico { font-size: 18px; }
   .upload-zone span.txt { font-size: 13.5px; font-weight: 500; }
   .upload-zone span.txt b { color: var(--text); font-weight: 600; }
+  .hint { font-size: 10.5px; color: var(--faint); text-align: center; margin-top: 6px; }
   input[type="file"] { display: none; }
 
   /* PLAYER */
@@ -212,6 +213,14 @@
   .playlist-item.active .info .name { color: var(--accent); }
   .playlist-item .info .meta { font-size: 10.5px; color: var(--faint); margin-top: 1px; }
   .playlist-item .pl-status { width: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pl-del {
+    width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0;
+    border: none; background: transparent; color: var(--faint);
+    font-size: 15px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s ease;
+  }
+  .pl-del:hover { background: rgba(248,113,113,.15); color: #f87171; }
 
   /* spinner render kecil */
   .spin {
@@ -286,6 +295,7 @@
           <span class="ico dim" data-icon="upload"></span>
           <span class="txt"><b>Tap atau tarik</b> file audio ke sini</span>
         </div>
+        <div class="hint" id="storageHint">Tersimpan otomatis di browser ini — tetap ada walau di-refresh</div>
         <input type="file" id="fileInput" accept=".mp3,.wav,.flac,.ogg,.m4a,.aac,.opus" multiple>
 
         <div class="player">
@@ -450,6 +460,127 @@ const EQ_PRESETS = {
 };
 
 // ============================================================
+// PENYIMPANAN LOKAL (IndexedDB) — playlist tetap ada walau di-refresh
+// ============================================================
+const DB_NAME = 'aurora-sound-db';
+const DB_VERSION = 1;
+const STORE_NAME = 'tracks';
+let dbPromise = null;
+
+function openDB() {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject) => {
+    if (!window.indexedDB) { reject(new Error('IndexedDB tidak didukung')); return; }
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  return dbPromise;
+}
+async function dbPut(record) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).put(record);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function dbGetAll() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const req = tx.objectStore(STORE_NAME).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function dbDelete(id) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function dbClear() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).clear();
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+function makeId() {
+  return (crypto.randomUUID ? crypto.randomUUID() : 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2));
+}
+let warnedStorageFull = false;
+function savePersisted(item) {
+  return dbPut({
+    id: item.dbId,
+    name: item.name,
+    size: item.size,
+    duration: item.duration,
+    sampleRate: item.sampleRate,
+    isStudio: item.isStudio,
+    originalBlob: item.isStudio ? null : item.file,
+    studioBlob: item.blob || null,
+    addedAt: item.addedAt || Date.now()
+  }).catch(err => {
+    console.warn('Gagal menyimpan track ke penyimpanan lokal:', err);
+    if (!warnedStorageFull) {
+      warnedStorageFull = true;
+      toast('Penyimpanan lokal penuh/terbatas — lagu tetap diputar tapi tidak tersimpan permanen', 'err');
+    }
+  });
+}
+async function loadPersistedTracks() {
+  let tracks = [];
+  try { tracks = await dbGetAll(); } catch (e) { return; }
+  if (!tracks.length) return;
+  tracks.sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
+  for (const t of tracks) {
+    const blobForFile = t.studioBlob || t.originalBlob;
+    if (!blobForFile) continue;
+    const item = {
+      dbId: t.id,
+      file: blobForFile,
+      name: t.name,
+      size: t.size,
+      duration: t.duration,
+      sampleRate: t.sampleRate,
+      blob: t.studioBlob || null,
+      url: t.studioBlob ? URL.createObjectURL(t.studioBlob) : null,
+      rawUrl: t.studioBlob ? null : URL.createObjectURL(t.originalBlob),
+      isStudio: !!t.studioBlob,
+      addedAt: t.addedAt || Date.now()
+    };
+    items.push(item);
+    if (!item.isStudio) queueAutoConvert(items.length - 1);
+  }
+  renderPlaylist();
+  if (items.length) {
+    currentIndex = 0;
+    const first = items[0];
+    const src = (first.isStudio && first.url) ? first.url : first.rawUrl;
+    currentUrl = src;
+    audioPlayer.src = src;
+    audioPlayer.load();
+    updateUI(first);
+    bindAudioEvents();
+    toast('Playlist tersimpan dimuat kembali (' + items.length + ' lagu)', 'ok');
+  }
+}
+
+// ============================================================
 // TOAST
 // ============================================================
 function toast(msg, type = 'info') {
@@ -602,6 +733,7 @@ function renderPlaylist() {
           <div class="meta">${formatSize(it.size)} · ${formatDuration(it.duration)}</div>
         </div>
         <span class="pl-status">${statusHtml}</span>
+        <button class="pl-del" onclick="removeTrack(${i}, event)" title="Hapus">×</button>
       </div>
     `;
   }).join('');
@@ -618,7 +750,8 @@ async function addFiles(files) {
       continue;
     }
     const info = await getAudioInfo(file);
-    items.push({
+    const item = {
+      dbId: makeId(),
       file: file,
       name: file.name.replace(/\.[^.]+$/, ''),
       size: file.size,
@@ -627,10 +760,13 @@ async function addFiles(files) {
       blob: null,
       url: null,
       rawUrl: URL.createObjectURL(file), // langsung bisa diputar, tak perlu tunggu render
-      isStudio: false
-    });
+      isStudio: false,
+      addedAt: Date.now()
+    };
+    items.push(item);
     toast('+ ' + file.name, 'ok');
     renderPlaylist();
+    savePersisted(item);
     queueAutoConvert(items.length - 1);
   }
   if (currentIndex === -1 && items.length) {
@@ -708,6 +844,43 @@ function playPrev() {
 function playNext() {
   if (items.length < 2) return;
   loadAndPlay((currentIndex + 1) % items.length);
+}
+
+function removeTrack(index, evt) {
+  if (evt) evt.stopPropagation();
+  const it = items[index];
+  if (!it) return;
+  if (it.url) URL.revokeObjectURL(it.url);
+  if (it.rawUrl) URL.revokeObjectURL(it.rawUrl);
+  if (it.dbId) dbDelete(it.dbId).catch(() => {});
+  const wasCurrent = index === currentIndex;
+  items.splice(index, 1);
+  if (wasCurrent) {
+    audioPlayer.pause();
+    audioPlayer.removeAttribute('src');
+    audioPlayer.load();
+    currentUrl = null;
+    if (items.length) {
+      currentIndex = Math.min(index, items.length - 1);
+      loadItem(currentIndex);
+    } else {
+      currentIndex = -1;
+      songTitle.textContent = 'Belum ada lagu';
+      songArtist.textContent = 'Upload audio untuk mulai';
+      playBtn.disabled = true;
+      playIcon.innerHTML = icon('play');
+      progressFill.style.width = '0%';
+      currentTime.textContent = '0:00';
+      totalTime.textContent = '0:00';
+      coverIcon.innerHTML = icon('disc');
+      coverIcon.style.fontSize = '44px';
+      stopSpectrum();
+    }
+  } else if (index < currentIndex) {
+    currentIndex--;
+  }
+  renderPlaylist();
+  toast('Dihapus dari playlist', 'info');
 }
 
 // ============================================================
@@ -867,6 +1040,7 @@ async function convertItemToStudio(index) {
       URL.revokeObjectURL(oldItemUrl);
     }
     if (it.rawUrl) { URL.revokeObjectURL(it.rawUrl); it.rawUrl = null; }
+    savePersisted(it);
 
     toast('✅ ' + it.name + ' — lossless siap', 'ok');
     setStatus('Siap memutar audio', 'ok');
@@ -900,11 +1074,12 @@ function downloadAudio() {
 // RESET
 // ============================================================
 function resetPlayer() {
-  if (!confirm('Reset pemutar?')) return;
+  if (!confirm('Reset pemutar? Semua lagu di playlist (termasuk yang tersimpan di browser ini) akan dihapus permanen.')) return;
   items.forEach(it => {
     if (it.url) URL.revokeObjectURL(it.url);
     if (it.rawUrl) URL.revokeObjectURL(it.rawUrl);
   });
+  dbClear().catch(() => {});
   items = [];
   autoConvertQueue = [];
   currentIndex = -1;
@@ -958,10 +1133,13 @@ document.addEventListener('keydown', e => {
 // ============================================================
 // INIT
 // ============================================================
-initIcons();
-initSpectrum();
-bootFFmpeg();
-renderPlaylist();
+(async function init() {
+  initIcons();
+  initSpectrum();
+  renderPlaylist();
+  await loadPersistedTracks();
+  bootFFmpeg();
+})();
 
 window.addEventListener('beforeunload', e => {
   if (items.length) { e.preventDefault(); e.returnValue = ''; }
