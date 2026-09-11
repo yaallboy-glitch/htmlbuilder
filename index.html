@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>D'Londong Sound — Music Player</title>
+<title>D'Londong — Music Player</title>
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -48,20 +48,26 @@
   }
   .brand { display: flex; align-items: center; gap: 10px; }
   .brand .logo {
-    width: 38px; height: 38px; border-radius: 12px;
+    width: clamp(34px, 8vw, 38px); height: clamp(34px, 8vw, 38px); border-radius: 12px;
     background: var(--card); border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    color: var(--accent); font-size: 18px;
+    color: var(--accent); font-size: clamp(15px, 4vw, 18px);
+    flex-shrink: 0;
   }
-  .brand h1 { font-size: 17px; font-weight: 700; letter-spacing: -.2px; }
-  .status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--dim); font-weight: 500; }
-  .status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); transition: background .3s; }
+  .brand h1 { font-size: clamp(15px, 4vw, 17px); font-weight: 700; letter-spacing: -.2px; }
+  .status { display: flex; align-items: center; gap: 6px; font-size: clamp(10.5px, 2.6vw, 12px); color: var(--dim); font-weight: 500; }
+  .status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); transition: background .3s; flex-shrink: 0; }
   .status .dot.on { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 
   /* LAYOUT */
   .layout { display: grid; grid-template-columns: 1fr; gap: 14px; }
-  @media (min-width: 760px) {
-    .layout { grid-template-columns: 1fr 300px; align-items: start; }
+  @media (min-width: 620px) and (max-width: 959px) {
+    /* TABLET: keep single column but give the card more breathing room */
+    .app { max-width: 640px; }
+  }
+  @media (min-width: 960px) {
+    /* DESKTOP / PC: sidebar sits beside the player */
+    .layout { grid-template-columns: 1fr 320px; align-items: start; }
   }
 
   .card {
@@ -98,7 +104,7 @@
   .player { display: flex; flex-direction: column; gap: 16px; margin-top: 14px; }
 
   .cover {
-    width: 100%; aspect-ratio: 16/8; max-height: 220px;
+    width: 100%; aspect-ratio: 16/8; max-height: clamp(140px, 32vw, 220px);
     border-radius: 16px;
     background: linear-gradient(160deg, rgba(94,234,212,.08), rgba(255,255,255,.02));
     border: 1px solid var(--border);
@@ -119,10 +125,10 @@
 
   .song-info { text-align: center; }
   .song-info .title {
-    font-size: 18px; font-weight: 700; color: var(--text);
+    font-size: clamp(15.5px, 4.2vw, 18px); font-weight: 700; color: var(--text);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .song-info .artist { font-size: 12.5px; color: var(--dim); margin-top: 4px; min-height: 16px; }
+  .song-info .artist { font-size: clamp(11.5px, 3vw, 12.5px); color: var(--dim); margin-top: 4px; min-height: 16px; }
 
   .progress-wrap { display: flex; align-items: center; gap: 10px; }
   .progress-wrap .time { font-size: 11px; color: var(--faint); min-width: 34px; font-variant-numeric: tabular-nums; }
@@ -133,19 +139,19 @@
   }
   .progress-bar .fill { height: 100%; width: 0%; background: var(--accent); border-radius: 3px; }
 
-  .controls { display: flex; align-items: center; justify-content: center; gap: 18px; }
+  .controls { display: flex; align-items: center; justify-content: center; gap: clamp(12px, 4vw, 18px); }
   .controls .btn {
-    width: 44px; height: 44px; border-radius: 50%;
+    width: clamp(38px, 10vw, 44px); height: clamp(38px, 10vw, 44px); border-radius: 50%;
     border: 1px solid var(--border); background: var(--card);
-    color: var(--dim); font-size: 16px; cursor: pointer;
+    color: var(--dim); font-size: clamp(14px, 3.6vw, 16px); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    transition: all .15s ease;
+    transition: all .15s ease; flex-shrink: 0;
   }
   .controls .btn:hover:not(:disabled) { background: var(--card-hover); color: var(--text); }
   .controls .btn:active:not(:disabled) { transform: scale(.92); }
   .controls .btn:disabled { opacity: .3; cursor: not-allowed; }
   .controls .btn.play {
-    width: 56px; height: 56px; font-size: 20px;
+    width: clamp(48px, 13vw, 56px); height: clamp(48px, 13vw, 56px); font-size: clamp(17px, 4.5vw, 20px);
     background: var(--accent); border-color: var(--accent); color: #04211c;
   }
   .controls .btn.play:hover:not(:disabled) { filter: brightness(1.08); }
@@ -165,7 +171,7 @@
     -webkit-appearance: none; width: 13px; height: 13px;
     background: var(--accent); border-radius: 50%; cursor: pointer;
   }
-  select#eqSelect {
+  select#eqSelect, select#modeSelect {
     background: var(--card); border: 1px solid var(--border); color: var(--text);
     font-size: 12px; font-weight: 500; padding: 7px 10px; border-radius: 8px;
     cursor: pointer; outline: none;
@@ -263,11 +269,16 @@
 
   @media (max-width: 480px) {
     .card { padding: 14px; border-radius: 16px; }
-    .cover { max-height: 160px; }
-    .controls .btn { width: 40px; height: 40px; }
-    .controls .btn.play { width: 52px; height: 52px; }
     .bottom-row { justify-content: center; }
     .actions { margin-left: 0; }
+    select#eqSelect, select#modeSelect { flex: 1 1 auto; min-width: 0; }
+  }
+  @media (min-width: 481px) and (max-width: 959px) {
+    .card { padding: 16px; }
+  }
+  @media (min-width: 960px) {
+    .card { padding: 20px; }
+    .cover { max-height: 240px; }
   }
 </style>
 </head>
@@ -279,7 +290,7 @@
   <header class="header">
     <div class="brand">
       <div class="logo"><span class="ico" data-icon="headphones"></span></div>
-      <h1>Aurora Sound</h1>
+      <h1>D'Londong</h1>
     </div>
     <div class="status">
       <span class="dot" id="statusDot"></span>
@@ -334,6 +345,11 @@
               <option value="jazz">EQ: Jazz</option>
               <option value="bass">EQ: Bass</option>
               <option value="vocal">EQ: Vocal</option>
+            </select>
+            <select id="modeSelect" title="Mode audio">
+              <option value="stereo">🎧 Stereo</option>
+              <option value="mono">🔊 Mono</option>
+              <option value="8d">🌀 8D Audio</option>
             </select>
             <div class="actions">
               <button class="btn-sm" id="downloadBtn" title="Download hasil studio"><span class="ico" data-icon="download"></span></button>
@@ -422,6 +438,7 @@ const currentTime = $('currentTime');
 const totalTime = $('totalTime');
 const volumeSlider = $('volumeSlider');
 const eqSelect = $('eqSelect');
+const modeSelect = $('modeSelect');
 const statusText = $('statusText');
 const audioPlayer = $('audioPlayer');
 const playlist = $('playlist');
@@ -449,6 +466,12 @@ let autoConvertQueue = [];
 let isAutoConverting = false;
 let ffmpegLogBuffer = [];
 let currentRenderName = '';
+let currentMode = 'stereo';
+let sourceNode = null;
+let splitterNode = null, monoGainL = null, monoGainR = null, mergerNode = null;
+let pannerNode = null;
+let panLFO = null, panLFOGain = null;
+let audioGraphReady = false;
 
 const EQ_PRESETS = {
   flat: { low: 0, mid: 0, high: 0 },
@@ -462,7 +485,7 @@ const EQ_PRESETS = {
 // ============================================================
 // PENYIMPANAN LOKAL (IndexedDB) — playlist tetap ada walau di-refresh
 // ============================================================
-const DB_NAME = 'aurora-sound-db';
+const DB_NAME = 'dlondong-sound-db';
 const DB_VERSION = 1;
 const STORE_NAME = 'tracks';
 let dbPromise = null;
@@ -645,19 +668,90 @@ function initSpectrum() {
   }
 }
 function startSpectrum() {
-  if (!audioContext) {
+  setupAudioGraph();
+  if (audioContext && audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+  spectrum.classList.add('active');
+  animateSpectrum();
+}
+
+// ============================================================
+// AUDIO GRAPH — Stereo / Mono / 8D
+// ============================================================
+function setupAudioGraph() {
+  if (audioGraphReady) return;
+  try {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     analyser = audioContext.createAnalyser();
     analyser.fftSize = 256;
-    try {
-      const source = audioContext.createMediaElementSource(audioPlayer);
-      source.connect(analyser);
-      analyser.connect(audioContext.destination);
-    } catch(e) {}
     dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    sourceNode = audioContext.createMediaElementSource(audioPlayer);
+
+    // node untuk downmix Mono (L+R digabung, dikirim rata ke kedua channel)
+    splitterNode = audioContext.createChannelSplitter(2);
+    mergerNode = audioContext.createChannelMerger(2);
+    monoGainL = audioContext.createGain(); monoGainL.gain.value = 0.5;
+    monoGainR = audioContext.createGain(); monoGainR.gain.value = 0.5;
+
+    // node untuk pan Stereo / 8D
+    pannerNode = audioContext.createStereoPanner();
+
+    analyser.connect(audioContext.destination);
+    audioGraphReady = true;
+    applyAudioMode(currentMode);
+  } catch (e) {
+    // fallback: kalau Web Audio gagal, biarkan audio tetap jalan native
+    console.error(e);
   }
-  spectrum.classList.add('active');
-  animateSpectrum();
+}
+
+function applyAudioMode(mode) {
+  currentMode = mode;
+  if (!audioGraphReady) return;
+
+  stopPanLFO();
+  try { sourceNode.disconnect(); } catch (e) {}
+  try { splitterNode.disconnect(); } catch (e) {}
+  try { monoGainL.disconnect(); } catch (e) {}
+  try { monoGainR.disconnect(); } catch (e) {}
+  try { mergerNode.disconnect(); } catch (e) {}
+  try { pannerNode.disconnect(); } catch (e) {}
+
+  pannerNode.pan.cancelScheduledValues(audioContext.currentTime);
+  pannerNode.pan.setValueAtTime(0, audioContext.currentTime);
+
+  if (mode === 'mono') {
+    sourceNode.connect(splitterNode);
+    splitterNode.connect(monoGainL, 0);
+    splitterNode.connect(monoGainR, 1);
+    monoGainL.connect(mergerNode, 0, 0);
+    monoGainL.connect(mergerNode, 0, 1);
+    monoGainR.connect(mergerNode, 0, 0);
+    monoGainR.connect(mergerNode, 0, 1);
+    mergerNode.connect(pannerNode);
+  } else {
+    sourceNode.connect(pannerNode);
+  }
+  pannerNode.connect(analyser);
+
+  if (mode === '8d') startPanLFO();
+}
+
+function startPanLFO() {
+  stopPanLFO();
+  panLFO = audioContext.createOscillator();
+  panLFO.type = 'sine';
+  panLFO.frequency.value = 0.13; // ~1 putaran tiap 7-8 detik, khas efek 8D
+  panLFOGain = audioContext.createGain();
+  panLFOGain.gain.value = 0.9; // ayun antar -0.9 s/d 0.9 biar tidak mentok mati sebelah
+  panLFO.connect(panLFOGain);
+  panLFOGain.connect(pannerNode.pan);
+  panLFO.start();
+}
+
+function stopPanLFO() {
+  if (panLFO) { try { panLFO.stop(); panLFO.disconnect(); } catch (e) {} panLFO = null; }
+  if (panLFOGain) { try { panLFOGain.disconnect(); } catch (e) {} panLFOGain = null; }
 }
 function animateSpectrum() {
   if (!analyser) return;
@@ -945,6 +1039,11 @@ eqSelect.addEventListener('change', () => {
   currentEQ = eqSelect.value;
   toast('EQ: ' + currentEQ, 'info');
 });
+modeSelect.addEventListener('change', () => {
+  applyAudioMode(modeSelect.value);
+  const labels = { stereo: 'Stereo', mono: 'Mono', '8d': '8D Audio 🌀' };
+  toast('Mode: ' + (labels[modeSelect.value] || modeSelect.value), 'info');
+});
 downloadBtn.addEventListener('click', downloadAudio);
 resetBtn.addEventListener('click', resetPlayer);
 
@@ -1101,6 +1200,8 @@ function resetPlayer() {
   renderPlaylist();
   isLooping = false;
   loopBtn.classList.remove('loop-on');
+  modeSelect.value = 'stereo';
+  applyAudioMode('stereo');
 }
 
 // ============================================================
