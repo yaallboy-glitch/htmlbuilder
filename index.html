@@ -397,8 +397,10 @@
 // ============================================================
 // IMPORTS
 // ============================================================
-const { FFmpeg } = FFmpegWASM;
-const { toBlobURL, fetchFile } = FFmpegUtil;
+const FFmpeg = (typeof FFmpegWASM !== 'undefined' && FFmpegWASM.FFmpeg) ? FFmpegWASM.FFmpeg : null;
+const toBlobURL = (typeof FFmpegUtil !== 'undefined' && FFmpegUtil.toBlobURL) ? FFmpegUtil.toBlobURL : null;
+const fetchFile = (typeof FFmpegUtil !== 'undefined' && FFmpegUtil.fetchFile) ? FFmpegUtil.fetchFile : null;
+const ffmpegLibAvailable = !!(FFmpeg && toBlobURL && fetchFile);
 
 // ============================================================
 // ICONS
@@ -827,6 +829,11 @@ function setStatus(msg, type = 'info') {
 // BOOT FFMPEG
 // ============================================================
 async function bootFFmpeg() {
+  if (!ffmpegLibAvailable) {
+    setStatus('Siap memutar audio (mode ringan)', 'ok');
+    toast('Engine render lossless gagal dimuat — lagu tetap bisa diputar normal', 'info');
+    return;
+  }
   setStatus('Memuat engine...', 'info');
   try {
     ffmpeg = new FFmpeg();
@@ -840,8 +847,8 @@ async function bootFFmpeg() {
     setStatus('Siap memutar audio', 'ok');
     processAutoConvertQueue();
   } catch (e) {
-    setStatus('Gagal load engine', 'err');
-    toast('Gagal load engine render', 'err');
+    setStatus('Siap memutar audio (mode ringan)', 'ok');
+    toast('Gagal load engine render lossless — lagu tetap bisa diputar normal', 'info');
   }
 }
 
