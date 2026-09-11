@@ -471,6 +471,7 @@ let sourceNode = null;
 let splitterNode = null, monoGainL = null, monoGainR = null, mergerNode = null;
 let pannerNode = null;
 let panLFO = null, panLFOGain = null;
+let volumeGainNode = null;
 let audioGraphReady = false;
 
 const EQ_PRESETS = {
@@ -696,8 +697,15 @@ function setupAudioGraph() {
     // node untuk pan Stereo / 8D
     pannerNode = audioContext.createStereoPanner();
 
+    // gain node khusus buat volume — audio.volume bawaan tidak reliabel
+    // begitu elemen audio disambungkan ke Web Audio graph
+    volumeGainNode = audioContext.createGain();
+    volumeGainNode.gain.value = volumeSlider.value / 100;
+
+    volumeGainNode.connect(analyser);
     analyser.connect(audioContext.destination);
     audioGraphReady = true;
+    audioPlayer.volume = 1; // volume sekarang dikontrol lewat volumeGainNode, bukan elemen <audio>
     applyAudioMode(currentMode);
   } catch (e) {
     // fallback: kalau Web Audio gagal, biarkan audio tetap jalan native
@@ -732,7 +740,7 @@ function applyAudioMode(mode) {
   } else {
     sourceNode.connect(pannerNode);
   }
-  pannerNode.connect(analyser);
+  pannerNode.connect(volumeGainNode);
 
   if (mode === '8d') startPanLFO();
 }
@@ -1011,7 +1019,14 @@ function bindAudioEvents() {
     renderPlaylist();
   };
   audioPlayer.onerror = () => toast('Error memutar audio', 'err');
-  volumeSlider.oninput = () => { audioPlayer.volume = volumeSlider.value / 100; };
+  volumeSlider.oninput = () => {
+    const v = volumeSlider.value / 100;
+    if (volumeGainNode) {
+      volumeGainNode.gain.setTargetAtTime(v, audioContext.currentTime, 0.01);
+    } else {
+      audioPlayer.volume = v;
+    }
+  };
   audioPlayer.volume = volumeSlider.value / 100;
   progressBar.onclick = (e) => {
     if (!audioPlayer.duration) return;
