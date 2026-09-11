@@ -20,12 +20,13 @@
     --accent: #5eead4;
     --accent-dim: rgba(94,234,212,.15);
   }
-  html, body { height: 100%; }
+  html, body { height: 100%; overflow-x: hidden; }
   body {
     font-family: 'Inter', sans-serif;
     background: radial-gradient(circle at 20% 0%, #14171d 0%, var(--bg) 55%);
     color: var(--text);
     min-height: 100vh;
+    width: 100%;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -38,6 +39,7 @@
   .app {
     width: 100%;
     max-width: 980px;
+    min-width: 0;
     margin-top: clamp(4px, 2vh, 24px);
   }
 
@@ -60,10 +62,11 @@
   .status .dot.on { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 
   /* LAYOUT */
-  .layout { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .layout { display: grid; grid-template-columns: 1fr; gap: 14px; min-width: 0; }
+  .layout .main, .layout .sidebar { min-width: 0; }
   @media (min-width: 620px) and (max-width: 959px) {
-    /* TABLET: keep single column but give the card more breathing room */
-    .app { max-width: 640px; }
+    /* TABLET: kartu tetap ringkas & center, jangan melebar penuh */
+    .app { max-width: 480px; }
   }
   @media (min-width: 960px) {
     /* DESKTOP / PC: sidebar sits beside the player */
@@ -77,6 +80,7 @@
     padding: 18px;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    min-width: 0;
   }
 
   /* UPLOAD */
@@ -101,7 +105,7 @@
   input[type="file"] { display: none; }
 
   /* PLAYER */
-  .player { display: flex; flex-direction: column; gap: 16px; margin-top: 14px; }
+  .player { display: flex; flex-direction: column; gap: 16px; margin-top: 14px; min-width: 0; }
 
   .cover {
     width: 100%; aspect-ratio: 16/8; max-height: clamp(140px, 32vw, 220px);
@@ -123,12 +127,24 @@
     opacity: .55; min-height: 2px; transition: height .06s ease;
   }
 
-  .song-info { text-align: center; }
+  .song-info { text-align: center; min-width: 0; max-width: 100%; }
   .song-info .title {
     font-size: clamp(15.5px, 4.2vw, 18px); font-weight: 700; color: var(--text);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    overflow: hidden; white-space: nowrap; min-width: 0; max-width: 100%;
+    position: relative;
   }
-  .song-info .artist { font-size: clamp(11.5px, 3vw, 12.5px); color: var(--dim); margin-top: 4px; min-height: 16px; }
+  .song-info .title .marquee-track { display: inline-block; will-change: transform; }
+  .song-info .title.marquee .marquee-track {
+    animation: marqueeScroll var(--marquee-duration, 8s) ease-in-out infinite alternate;
+  }
+  @keyframes marqueeScroll {
+    0%, 12% { transform: translateX(0); }
+    88%, 100% { transform: translateX(var(--marquee-distance, 0px)); }
+  }
+  .song-info .artist {
+    font-size: clamp(11.5px, 3vw, 12.5px); color: var(--dim); margin-top: 4px; min-height: 16px;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100%; min-width: 0;
+  }
 
   .progress-wrap { display: flex; align-items: center; gap: 10px; }
   .progress-wrap .time { font-size: 11px; color: var(--faint); min-width: 34px; font-variant-numeric: tabular-nums; }
@@ -316,7 +332,7 @@
           </div>
 
           <div class="song-info">
-            <div class="title" id="songTitle">Belum ada lagu</div>
+            <div class="title" id="songTitle"><span class="marquee-track" id="songTitleTrack">Belum ada lagu</span></div>
             <div class="artist" id="songArtist">Upload audio untuk mulai</div>
           </div>
 
@@ -424,6 +440,7 @@ const coverArt = $('coverArt');
 const coverIcon = $('coverIcon');
 const spectrum = $('spectrum');
 const songTitle = $('songTitle');
+const songTitleTrack = $('songTitleTrack');
 const songArtist = $('songArtist');
 const statusLabel = $('statusLabel');
 const statusDot = $('statusDot');
@@ -630,6 +647,26 @@ function formatDuration(s) {
   const m = Math.floor(s / 60), sec = s % 60;
   return m + ':' + (sec < 10 ? '0' + sec : sec);
 }
+
+// ============================================================
+// SONG TITLE MARQUEE — biar teks panjang gak ngerubah ukuran layout
+// ============================================================
+function setSongTitle(text) {
+  songTitleTrack.textContent = text;
+  songTitle.classList.remove('marquee');
+  songTitleTrack.style.setProperty('--marquee-distance', '0px');
+  requestAnimationFrame(() => {
+    const overflow = songTitleTrack.scrollWidth - songTitle.clientWidth;
+    if (overflow > 2) {
+      const distance = overflow + 4;
+      const duration = Math.max(4, Math.min(16, distance / 28));
+      songTitleTrack.style.setProperty('--marquee-distance', (-distance) + 'px');
+      songTitleTrack.style.setProperty('--marquee-duration', duration + 's');
+      songTitle.classList.add('marquee');
+    }
+  });
+}
+window.addEventListener('resize', () => setSongTitle(songTitleTrack.textContent));
 
 // ============================================================
 // GET AUDIO INFO
@@ -916,7 +953,7 @@ async function loadItem(index) {
 }
 
 function updateUI(it) {
-  songTitle.textContent = it.name;
+  setSongTitle(it.name);
   coverIcon.innerHTML = icon('headphones');
   coverIcon.style.fontSize = '38px';
   playBtn.disabled = false;
@@ -967,7 +1004,7 @@ function removeTrack(index, evt) {
       loadItem(currentIndex);
     } else {
       currentIndex = -1;
-      songTitle.textContent = 'Belum ada lagu';
+      setSongTitle('Belum ada lagu');
       songArtist.textContent = 'Upload audio untuk mulai';
       playBtn.disabled = true;
       playIcon.innerHTML = icon('play');
@@ -1200,7 +1237,7 @@ function resetPlayer() {
   currentUrl = null;
   audioPlayer.src = '';
   audioPlayer.load();
-  songTitle.textContent = 'Belum ada lagu';
+  setSongTitle('Belum ada lagu');
   songArtist.textContent = 'Upload audio untuk mulai';
   playBtn.disabled = true;
   playIcon.innerHTML = icon('play');
@@ -1252,6 +1289,7 @@ document.addEventListener('keydown', e => {
 (async function init() {
   initIcons();
   initSpectrum();
+  setSongTitle(songTitleTrack.textContent);
   renderPlaylist();
   await loadPersistedTracks();
   bootFFmpeg();
